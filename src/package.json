@@ -1,0 +1,16 @@
+{
+  "name": "remote-controlled-sites",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "packageManager": "yarn@3.2.0",
+  "scripts": {
+    "start": "yarn workspaces foreach -pi run start",
+    "build": "yarn workspaces foreach -pti run build"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  }
+}
