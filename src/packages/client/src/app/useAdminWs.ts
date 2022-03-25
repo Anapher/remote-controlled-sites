@@ -1,7 +1,10 @@
+import { ScreenDto } from "../shared/Screen";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
   REQUEST_ALL_SCREENS,
+  REQUEST_DEL_SCREEN,
+  REQUEST_PUT_SCREEN,
   RESPONSE_ALL_SCREENS,
   ScreensResponse,
 } from "../shared/ws-server-messages";
@@ -26,6 +29,8 @@ export default function useAdminWs(password: string | null): {
     const sock = io({ auth: { token: password } });
 
     const allScreensHandler = (data: ScreensResponse) => {
+      console.log("receive screens", data);
+
       dispatch(setScreens(data.screens));
     };
 
@@ -66,4 +71,12 @@ export default function useAdminWs(password: string | null): {
 
 export function sendRequestScreens(socket: Socket) {
   socket.emit(REQUEST_ALL_SCREENS);
+}
+
+export function sendPutScreen(socket: Socket, screen: ScreenDto) {
+  socket.emit(REQUEST_PUT_SCREEN, screen);
+}
+
+export function sendDelScreen(socket: Socket, name: string) {
+  socket.emit(REQUEST_DEL_SCREEN, name);
 }
