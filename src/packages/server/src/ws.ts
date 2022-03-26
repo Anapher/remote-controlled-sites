@@ -53,7 +53,7 @@ export default function configureWebSockets(app: Express) {
 
   const updateScreens = async () => {
     const response = await getScreenResponse();
-    io.emit(RESPONSE_ALL_SCREENS, response);
+    io.to(ADMIN_ROOM_NAME).emit(RESPONSE_ALL_SCREENS, response);
   };
 
   io.on("connection", (socket) => {

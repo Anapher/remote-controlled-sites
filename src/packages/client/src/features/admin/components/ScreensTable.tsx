@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonGroup,
   Table,
   TableBody,
   TableCell,
@@ -34,6 +35,17 @@ export default function ScreensTable({ onDelete, onEdit }: Props) {
   const screens = useSelector(selectScreens);
   console.log(screens);
 
+  const handleDeleteWithConfirm = (screen: ScreenDto) => {
+    if (
+      // eslint-disable-next-line no-restricted-globals
+      confirm(
+        `Sind Sie sicher, dass Sie den Bildschirm ${screen.name} löschen möchten?`
+      )
+    ) {
+      onDelete(screen);
+    }
+  };
+
   return (
     <Table>
       <TableHead>
@@ -49,9 +61,14 @@ export default function ScreensTable({ onDelete, onEdit }: Props) {
             <TableCell>{x.name}</TableCell>
             <TableCell>{renderContent(x.content)}</TableCell>
             <TableCell>
-              <Button onClick={() => onDelete(x)}>Löschen</Button>
-              <Button onClick={() => onEdit(x)}>Bearbeiten</Button>
-              <Button>Url kopieren</Button>
+              <ButtonGroup size="small">
+                <Button>Url kopieren</Button>
+                <Button>Bildschirm teilen</Button>
+                <Button onClick={() => onEdit(x)}>Bearbeiten</Button>
+                <Button onClick={() => handleDeleteWithConfirm(x)}>
+                  Löschen
+                </Button>
+              </ButtonGroup>
             </TableCell>
           </TableRow>
         ))}
