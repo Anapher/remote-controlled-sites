@@ -28,7 +28,11 @@ export default function CreateEditDialog({
   isEditing,
 }: Props) {
   const { control, handleSubmit, reset } = useForm<ScreenDto>({
-    defaultValues: data,
+    defaultValues: {
+      name: "",
+      defaultContent: "",
+      ...data,
+    },
     resolver: zodResolver(ScreenSchema),
   });
 
@@ -78,7 +82,7 @@ export default function CreateEditDialog({
                 <TextField
                   variant="standard"
                   value={value}
-                  onChange={(ev) => onChange(ev.target.value || undefined)}
+                  onChange={onChange}
                   label="Standard-Url"
                   error={!!error}
                   helperText={error?.message}

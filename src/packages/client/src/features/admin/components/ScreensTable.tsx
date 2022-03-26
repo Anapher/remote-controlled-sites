@@ -5,11 +5,25 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Typography,
 } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
-import { ScreenDto } from "../../../shared/Screen";
+import { ScreenContent, ScreenDto } from "../../../shared/Screen";
 import { selectScreens } from "../slice";
+
+function renderContent(content: ScreenContent | null) {
+  if (!content)
+    return (
+      <Typography fontSize="inherit" fontStyle="italic">
+        Keiner
+      </Typography>
+    );
+
+  if (content.type === "url") {
+    return <Typography fontSize="inherit">{content.url}</Typography>;
+  }
+}
 
 type Props = {
   onDelete: (screen: ScreenDto) => void;
@@ -18,6 +32,7 @@ type Props = {
 
 export default function ScreensTable({ onDelete, onEdit }: Props) {
   const screens = useSelector(selectScreens);
+  console.log(screens);
 
   return (
     <Table>
@@ -32,7 +47,7 @@ export default function ScreensTable({ onDelete, onEdit }: Props) {
         {screens?.map((x) => (
           <TableRow key={x.name}>
             <TableCell>{x.name}</TableCell>
-            <TableCell>asd</TableCell>
+            <TableCell>{renderContent(x.content)}</TableCell>
             <TableCell>
               <Button onClick={() => onDelete(x)}>Löschen</Button>
               <Button onClick={() => onEdit(x)}>Bearbeiten</Button>

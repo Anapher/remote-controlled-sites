@@ -10,7 +10,8 @@ import http from "http";
 import { Server } from "socket.io";
 import { ADMIN_PASSWORD } from "./config";
 import { deleteScreen, getAllScreens, setScreen } from "./database";
-import { ScreenDto, ScreenSchema } from "./shared/Screen";
+import { ScreenDto, ScreenInfo, ScreenSchema } from "./shared/Screen";
+import { getScreenContent } from "./screen-content-manager";
 
 const ADMIN_ROOM_NAME = "admin";
 
@@ -42,7 +43,11 @@ export default function configureWebSockets(app: Express) {
 
   const getScreenResponse = async () => {
     const screens = await getAllScreens();
-    const response: ScreensResponse = { screens };
+    const screensWithContent = screens.map<ScreenInfo>((x) => ({
+      ...x,
+      content: getScreenContent(x),
+    }));
+    const response: ScreensResponse = { screens: screensWithContent };
     return response;
   };
 

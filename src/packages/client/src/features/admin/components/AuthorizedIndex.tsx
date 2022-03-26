@@ -48,13 +48,14 @@ export default function AuthorizedIndex({ socket }: Props) {
       <Typography variant="h4" textAlign="center" gutterBottom>
         Bildschirme
       </Typography>
-      <Button onClick={handleOpenDialogCreate}>
-        Neuen Bildschirm erstellen
-      </Button>
+
       <ScreensTable
         onDelete={handleDeleteScreen}
         onEdit={handleOpenDialogEdit}
       />
+      <Button onClick={handleOpenDialogCreate} sx={{ mt: 3 }}>
+        Neuen Bildschirm erstellen
+      </Button>
       {dialogOpen && (
         <CreateEditDialog
           isEditing={!!editingScreen}

@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ScreenDto } from "../../shared/Screen";
+import { ScreenInfo } from "../../shared/Screen";
 import { RootState } from "../../app/store";
 
 interface AdminState {
-  screens: ScreenDto[] | null;
+  screens: ScreenInfo[] | null;
 }
 
 const initialState: AdminState = {
@@ -14,7 +14,7 @@ export const counterSlice = createSlice({
   name: "admin",
   initialState,
   reducers: {
-    setScreens(state, { payload }: PayloadAction<ScreenDto[]>) {
+    setScreens(state, { payload }: PayloadAction<ScreenInfo[]>) {
       state.screens = payload;
     },
   },
