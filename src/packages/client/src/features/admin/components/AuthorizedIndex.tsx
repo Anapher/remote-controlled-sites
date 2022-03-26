@@ -16,13 +16,23 @@ type Props = {
 
 export default function AuthorizedIndex({ socket }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingScreen, setEditingScreen] = useState<ScreenDto | null>(null);
 
   useEffect(() => {
     sendRequestScreens(socket);
   }, [socket]);
 
   const handleCloseDialog = () => setDialogOpen(false);
-  const handleOpenDialog = () => setDialogOpen(true);
+
+  const handleOpenDialogCreate = () => {
+    setDialogOpen(true);
+    setEditingScreen(null);
+  };
+
+  const handleOpenDialogEdit = (data: ScreenDto) => {
+    setDialogOpen(true);
+    setEditingScreen(data);
+  };
 
   const handleCreate = (data: ScreenDto) => {
     sendPutScreen(socket, data);
@@ -38,14 +48,22 @@ export default function AuthorizedIndex({ socket }: Props) {
       <Typography variant="h4" textAlign="center" gutterBottom>
         Bildschirme
       </Typography>
-      <Button onClick={handleOpenDialog}>Neuen Bildschirm erstellen</Button>
-      <ScreensTable onDelete={handleDeleteScreen} />
-      <CreateEditDialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
-        onExecute={handleCreate}
-        data={{}}
+      <Button onClick={handleOpenDialogCreate}>
+        Neuen Bildschirm erstellen
+      </Button>
+      <ScreensTable
+        onDelete={handleDeleteScreen}
+        onEdit={handleOpenDialogEdit}
       />
+      {dialogOpen && (
+        <CreateEditDialog
+          isEditing={!!editingScreen}
+          open={true}
+          onClose={handleCloseDialog}
+          onExecute={handleCreate}
+          data={editingScreen || {}}
+        />
+      )}
     </Container>
   );
 }

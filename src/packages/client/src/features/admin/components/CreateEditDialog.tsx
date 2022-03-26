@@ -1,12 +1,23 @@
-import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
-import React from "react";
-import { ScreenDto } from "../../../shared/Screen";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  TextField,
+} from "@mui/material";
+import React, { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { ScreenDto, ScreenSchema } from "../../../shared/Screen";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type Props = {
   data: Partial<ScreenDto>;
   open: boolean;
   onClose: () => void;
   onExecute: (data: ScreenDto) => void;
+  isEditing: boolean;
 };
 
 export default function CreateEditDialog({
@@ -14,17 +25,75 @@ export default function CreateEditDialog({
   open,
   onClose,
   onExecute,
+  isEditing,
 }: Props) {
-  const handleCreate = () => {
-    onExecute({ name: "test" });
+  const { control, handleSubmit, reset } = useForm<ScreenDto>({
+    defaultValues: data,
+    resolver: zodResolver(ScreenSchema),
+  });
+
+  useEffect(() => {
+    reset();
+  }, [reset, open]);
+
+  const onSubmit = (data: ScreenDto) => {
+    onExecute(data);
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Neuen Bildschirm erstellen</DialogTitle>
-      <DialogActions>
-        <Button onClick={handleCreate}>Erstellen</Button>
-      </DialogActions>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>
+        {isEditing ? "Bildschirm bearbeiten" : "Neuen Bildschirm erstellen"}
+      </DialogTitle>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent>
+          <Stack spacing={2}>
+            <Controller
+              control={control}
+              name="name"
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <TextField
+                  autoFocus
+                  variant="standard"
+                  value={value}
+                  onChange={onChange}
+                  label="Name"
+                  error={!!error}
+                  helperText={error?.message}
+                  disabled={isEditing}
+                  required
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="defaultContent"
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <TextField
+                  variant="standard"
+                  value={value}
+                  onChange={(ev) => onChange(ev.target.value || undefined)}
+                  label="Standard-Url"
+                  error={!!error}
+                  helperText={error?.message}
+                />
+              )}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Abbrechen</Button>
+          <Button type="submit">
+            {isEditing ? "Aktualisieren" : "Erstellen"}
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 }

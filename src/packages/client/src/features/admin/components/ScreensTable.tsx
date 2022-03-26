@@ -13,11 +13,11 @@ import { selectScreens } from "../slice";
 
 type Props = {
   onDelete: (screen: ScreenDto) => void;
+  onEdit: (screen: ScreenDto) => void;
 };
 
-export default function ScreensTable({ onDelete }: Props) {
+export default function ScreensTable({ onDelete, onEdit }: Props) {
   const screens = useSelector(selectScreens);
-  console.log(screens);
 
   return (
     <Table>
@@ -35,7 +35,7 @@ export default function ScreensTable({ onDelete }: Props) {
             <TableCell>asd</TableCell>
             <TableCell>
               <Button onClick={() => onDelete(x)}>Löschen</Button>
-              <Button>Bearbeiten</Button>
+              <Button onClick={() => onEdit(x)}>Bearbeiten</Button>
               <Button>Url kopieren</Button>
             </TableCell>
           </TableRow>
