@@ -1,16 +1,31 @@
-import express from "express";
-import { configureApi } from "./api";
-import configureWebSockets from "./ws";
+import express from 'express';
+import { configureApi } from './api';
+import MediaSoupWorkers from './webrtc/media-soup-workers';
+import configureWebSockets from './websockets';
+import config from './config';
+import WebRtcManager from './webrtc/webrtc-manager';
+import { Server } from 'socket.io';
+import http from 'http';
+import SocketIoClientMessenger from './websockets/socketio-client-messenger';
 
-const port = process.env.PORT || 4000;
+main();
 
-const app = express();
-app.use(express.json());
+async function main() {
+   const workers = new MediaSoupWorkers();
+   await workers.run(config.mediasoup.numWorkers, config.mediasoup.workerSettings);
 
-configureApi(app);
+   const app = express();
+   app.use(express.json());
 
-const server = configureWebSockets(app);
+   const server = http.createServer(app);
+   const io = new Server(server);
 
-server.listen(port, () =>
-  console.log(`Server is running on port: http://localhost:${port}`)
-);
+   const manager = new WebRtcManager(workers, new SocketIoClientMessenger(io));
+
+   configureApi(app, manager);
+   configureWebSockets(io, manager);
+
+   server.listen(config.http.port, () =>
+      console.log(`Server is running on port: http://localhost:${config.http.port}`),
+   );
+}
