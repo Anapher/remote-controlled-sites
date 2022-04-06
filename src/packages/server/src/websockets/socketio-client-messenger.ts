@@ -11,6 +11,9 @@ import {
 import { ConnectionRoomName } from './consts';
 import * as msg from '../shared/ws-server-messages';
 
+/**
+ * Implementation of client messenger using socket.io
+ */
 export default class SocketIoClientMessenger implements ClientMessenger {
    constructor(private io: Server) {}
 

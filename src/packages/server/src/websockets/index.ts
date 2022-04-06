@@ -5,7 +5,8 @@ import registerMethods from './methods';
 
 /**
  * Configure websockets on the express server
- * @param app the express reference
+ * @param io the socket io reference
+ * @param manager a reference to the room manager
  */
 export default function configureWebSockets(io: Server, manager: WebRtcManager) {
    // add authentication middleware and verify the token

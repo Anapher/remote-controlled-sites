@@ -24,6 +24,10 @@ export function verifyToken(token: string) {
    });
 }
 
+/**
+ * Middleware for express.js that authenticates the jwt and adds the field user to the
+ * request (of type AuthUserInfo)
+ */
 export const authenticateToken: RequestHandler = async (req, res, next) => {
    const authHeader = req.headers['authorization'];
    const token = authHeader && authHeader.split(' ')[1];

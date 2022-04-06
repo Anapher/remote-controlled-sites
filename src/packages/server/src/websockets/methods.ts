@@ -13,7 +13,6 @@ import {
    ScreensResponse,
 } from '../shared/ws-server-messages';
 import WebRtcManager from '../webrtc/webrtc-manager';
-import { SocketAddress } from 'net';
 
 export default function registerMethods(io: Server, manager: WebRtcManager) {
    const getScreenResponse = async () => {
@@ -78,8 +77,7 @@ export default function registerMethods(io: Server, manager: WebRtcManager) {
          }
 
          socket.data.joinRoom = screen.name;
-         await manager.joinRoom(screen.name, {
-            connectionId: userId,
+         await manager.joinRoom(screen.name, userId, {
             sctpCapabilities: req.sctpCapabilities,
             rtpCapabilities: req.rtpCapabilities,
          });

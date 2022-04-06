@@ -1,9 +1,12 @@
 import config from '../config';
+import { InitializeConnectionRequest } from '../shared/webrtc-types';
 import ClientMessenger from './client-messenger';
 import MediaSoupWorkers from './media-soup-workers';
-import { InitializeConnectionRequest } from './request-types';
 import Room from './room';
 
+/**
+ * Manage webrtc rooms
+ */
 export default class WebRtcManager {
    private rooms = new Map<string, Promise<Room>>();
    private userToRoom = new Map<string, string>();
@@ -23,6 +26,11 @@ export default class WebRtcManager {
       );
    }
 
+   /**
+    * Get the room of a user
+    * @param userId the user id
+    * @returns return the room or null if the user does not currently belong to a room
+    */
    async getRoomOfUser(userId: string): Promise<Room | null> {
       const roomId = this.userToRoom.get(userId);
       if (!roomId) return null;
@@ -33,7 +41,10 @@ export default class WebRtcManager {
       return await room;
    }
 
-   async joinRoom(roomId: string, req: InitializeConnectionRequest): Promise<void> {
+   /**
+    * Join user to a room, creating it if the room does not exist
+    */
+   async joinRoom(roomId: string, userId: string, req: InitializeConnectionRequest): Promise<void> {
       let room = this.rooms.get(roomId);
       if (!room) {
          room = this.createRoom(roomId);
@@ -41,10 +52,14 @@ export default class WebRtcManager {
       }
 
       const resolved = await room;
-      resolved.addUser(req);
-      this.userToRoom.set(req.connectionId, roomId);
+      resolved.addUser(req, userId);
+      this.userToRoom.set(userId, roomId);
    }
 
+   /**
+    * Remove a user from a room, deleting the room if it's empty
+    * @param userId user id
+    */
    async leaveRoom(userId: string): Promise<void> {
       const roomId = this.userToRoom.get(userId);
       if (!roomId) return;

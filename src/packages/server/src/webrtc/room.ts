@@ -2,6 +2,7 @@ import {
    ConnectTransportRequest,
    CreateTransportRequest,
    CreateTransportResponse,
+   InitializeConnectionRequest,
    ProducerSource,
    TransportProduceRequest,
    TransportProduceResponse,
@@ -11,12 +12,14 @@ import { MediaKind, Router, WebRtcTransportOptions } from 'mediasoup/node/lib/ty
 import ClientMessenger from './client-messenger';
 import Connection from './connection';
 import { MediasoupMixer } from './mediasoup-mixer';
-import { InitializeConnectionRequest } from './request-types';
 import * as errors from '../errors';
 import Logger from '../utils/logger';
 
 const logger = new Logger('Room');
 
+/**
+ * A webrtc room
+ */
 export default class Room {
    private connections = new Map<string, Connection>();
    private mixer: MediasoupMixer;
@@ -31,10 +34,16 @@ export default class Room {
       this.mixer = new MediasoupMixer(router, signal);
    }
 
-   public addUser({ connectionId, rtpCapabilities, sctpCapabilities }: InitializeConnectionRequest) {
-      this.connections.set(connectionId, new Connection(connectionId, rtpCapabilities, sctpCapabilities));
+   /**
+    * Add a new user to the room
+    */
+   public addUser({ rtpCapabilities, sctpCapabilities }: InitializeConnectionRequest, userId: string) {
+      this.connections.set(userId, new Connection(userId, rtpCapabilities, sctpCapabilities));
    }
 
+   /**
+    * Remove a user from the room
+    */
    public async removeUser(userId: string): Promise<SuccessOrError> {
       const connection = this.connections.get(userId);
 
@@ -63,7 +72,9 @@ export default class Room {
       return this.connections.size > 0;
    }
 
-   public close() {}
+   public close() {
+      throw 'Not implemented';
+   }
 
    /**
     * Initialize a new transport

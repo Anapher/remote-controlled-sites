@@ -70,7 +70,13 @@ type Config = {
       port: number;
    };
    api: {
+      /**
+       * the password admins use to sign in
+       */
       password: string;
+      /**
+       * For the jwts, just use something random
+       */
       tokenSecret: string;
    };
 };
