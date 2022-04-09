@@ -10,3 +10,5 @@ export const ADMIN_ROOM_NAME = 'admin';
  * @param id the client id
  */
 export const ConnectionRoomName = (id: string) => `client::${id}`;
+
+export const ScreenRoomName = (id: string) => `screen::${id}`;

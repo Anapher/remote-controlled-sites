@@ -1,4 +1,3 @@
-import { SuccessOrError } from '../../communication-types';
 import { MediaKind, RtpCapabilities, RtpParameters } from 'mediasoup-client/lib/RtpParameters';
 import { SctpCapabilities, SctpParameters } from 'mediasoup-client/lib/SctpParameters';
 import { DtlsParameters, IceCandidate, IceParameters } from 'mediasoup-client/lib/Transport';
@@ -33,7 +32,7 @@ export type ChangeProducerSourceRequest = {
 };
 
 export type ProducerDevice = 'mic' | 'webcam' | 'screen';
-export type ProducerSource = ProducerDevice | 'loopback-mic' | 'loopback-webcam' | 'loopback-screen';
+export type ProducerSource = ProducerDevice;
 
 export const ProducerDevices: ProducerDevice[] = ['mic', 'webcam', 'screen'];
 

@@ -21,6 +21,9 @@ export async function deleteScreen(name: string): Promise<void> {
    await db.del(name);
 }
 
-export async function getScreen(name: string): Promise<ScreenDto> {
-   return db.get(name);
+export async function getScreen(name: string): Promise<ScreenDto | null> {
+   const json = await db.get(name);
+   if (!json) return null;
+
+   return JSON.parse(json as string);
 }

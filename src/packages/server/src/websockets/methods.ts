@@ -1,7 +1,7 @@
-import { ADMIN_ROOM_NAME, ConnectionRoomName } from './consts';
+import { ADMIN_ROOM_NAME, ConnectionRoomName, ScreenRoomName } from './consts';
 import { Server } from 'socket.io';
 import { deleteScreen, getAllScreens, getScreen, setScreen } from '../database';
-import { getScreenContent } from '../screen-content-manager';
+import { getScreenContent, getScreenInfo } from '../screen-content-manager';
 import { ScreenDto, ScreenInfo, ScreenSchema } from '../shared/Screen';
 import {
    JoinRoomRequest,
@@ -11,6 +11,7 @@ import {
    REQUEST_PUT_SCREEN,
    RESPONSE_ALL_SCREENS,
    ScreensResponse,
+   SCREEN_UPDATED,
 } from '../shared/ws-server-messages';
 import WebRtcManager from '../webrtc/webrtc-manager';
 
@@ -49,6 +50,8 @@ export default function registerMethods(io: Server, manager: WebRtcManager) {
             const result = ScreenSchema.parse(screenDto);
             await setScreen(result);
             updateScreens();
+
+            io.emit(SCREEN_UPDATED, await getScreenInfo(screenDto.name));
          });
 
          socket.on(REQUEST_DEL_SCREEN, async (name: string) => {

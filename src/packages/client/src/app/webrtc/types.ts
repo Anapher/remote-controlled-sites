@@ -1,3 +1,16 @@
+import { RtpCapabilities } from 'mediasoup-client/lib/types';
+import { SuccessOrError } from '../../shared/communication-types';
+import {
+   ChangeStreamRequest,
+   ConnectTransportRequest,
+   CreateTransportRequest,
+   CreateTransportResponse,
+   InitializeConnectionRequest,
+   SetPreferredLayersRequest,
+   TransportProduceRequest,
+   TransportProduceResponse,
+} from '../../shared/webrtc-types';
+
 export type RestClientWebRtc = {
    getRouterCapabilities(): Promise<SuccessOrError<RtpCapabilities>>;
 

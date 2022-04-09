@@ -66,6 +66,8 @@ export default class Room {
       for (const [, transport] of connection.transports) {
          transport.close();
       }
+
+      return { success: true };
    }
 
    get hasUsers() {
@@ -176,9 +178,9 @@ export default class Room {
          appData,
       });
 
-      if (connection.producers[source]) {
-         connection.producers[source]?.producer.close();
-         connection.producers[source] = undefined;
+      if (connection.producers.get(source)) {
+         connection.producers.get(source)?.close();
+         connection.producers.delete(source);
       }
 
       producer.on('score', (score) => {

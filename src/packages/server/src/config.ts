@@ -46,7 +46,7 @@ const config: Config = {
       maxIncomingBitrate: 1500000,
    },
    http: {
-      port: Number(process.env.HTTP_PORT) || 3000,
+      port: Number(process.env.HTTP_PORT) || 4000,
    },
    api: {
       password: 'test',

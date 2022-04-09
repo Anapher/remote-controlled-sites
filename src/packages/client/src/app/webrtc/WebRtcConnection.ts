@@ -5,7 +5,8 @@ import { Device } from 'mediasoup-client';
 import { MediaKind, RtpParameters, Transport, Consumer } from 'mediasoup-client/lib/types';
 
 import { EventSubscription, subscribeEvent, unsubscribeAll } from '../../utils/event-emitter-utils';
-import { ChangeStreamRequest, ProducerSource, RestClientWebRtc } from '../../shared/webrtc-types';
+import { ChangeStreamRequest, ProducerSource } from '../../shared/webrtc-types';
+import { RestClientWebRtc } from './types';
 
 type OnNewConsumerPayload = {
    participantId: string;
@@ -75,7 +76,7 @@ export class WebRtcConnection extends TypedEmitter {
       this.sendTransport?.close();
       this.receiveTransport?.close();
 
-      for (const [_, consumer] of this.consumers.entries()) {
+      for (const [, consumer] of this.consumers.entries()) {
          consumer.close();
       }
       this.consumers.clear();

@@ -1,6 +1,15 @@
-import { MediaKind, RtpCapabilities, RtpParameters } from 'mediasoup-client/lib/RtpParameters';
-import { SctpCapabilities, SctpParameters } from 'mediasoup-client/lib/SctpParameters';
-import { DtlsParameters, IceCandidate, IceParameters } from 'mediasoup-client/lib/Transport';
+import {
+   DtlsParameters,
+   IceCandidate,
+   IceParameters,
+   SctpCapabilities,
+   SctpParameters,
+   MediaKind,
+   RtpCapabilities,
+   RtpParameters,
+} from 'mediasoup-client/lib/types';
+import { Transport } from 'mediasoup/node/lib/Transport';
+import { WebRtcTransport } from 'mediasoup/node/lib/WebRtcTransport';
 
 export type ChangeStreamRequest = {
    id: string;
@@ -55,7 +64,7 @@ export type CreateTransportRequest = {
 export type CreateTransportResponse = {
    id: string;
    iceParameters: IceParameters;
-   iceCandidates: IceCandidate[];
+   iceCandidates: WebRtcTransport['iceCandidates'];
    dtlsParameters: DtlsParameters;
    sctpParameters?: SctpParameters;
 };
