@@ -4,6 +4,7 @@ import ErrorScreen from '../../../components/ErrorScreen';
 import Loading from '../../../components/Loading';
 import useAuthToken from '../../../hooks/useAuthToken';
 import { authAsAdmin } from '../../../services/auth';
+import Token from '../hooks/useToken';
 import AuthorizedIndex from './AuthorizedIndex';
 
 export default function AdminIndex() {
@@ -20,7 +21,11 @@ export default function AdminIndex() {
 
    if (connectionError) return <ErrorScreen message="Ein Verbindungsfehler ist aufgetreten" />;
 
-   if (!connected || !socket) return <Loading message="Verbinde..." />;
+   if (!connected || !socket || !token) return <Loading message="Verbinde..." />;
 
-   return <AuthorizedIndex socket={socket} />;
+   return (
+      <Token.Provider value={token}>
+         <AuthorizedIndex socket={socket} />
+      </Token.Provider>
+   );
 }

@@ -44,7 +44,18 @@ export default class WebRtcManager {
    /**
     * Join user to a room, creating it if the room does not exist
     */
-   async joinRoom(roomId: string, userId: string, req: InitializeConnectionRequest): Promise<void> {
+   async joinRoom(roomId: string, userId: string): Promise<void> {
+      const existingRoom = this.userToRoom.get(userId);
+      if (existingRoom) {
+         // remove user from current room
+         const room = await this.rooms.get(existingRoom);
+         if (room) {
+            await room.removeUser(userId);
+         }
+
+         this.userToRoom.delete(userId);
+      }
+
       let room = this.rooms.get(roomId);
       if (!room) {
          room = this.createRoom(roomId);
@@ -52,7 +63,7 @@ export default class WebRtcManager {
       }
 
       const resolved = await room;
-      resolved.addUser(req, userId);
+      resolved.addUser(userId);
       this.userToRoom.set(userId, roomId);
    }
 

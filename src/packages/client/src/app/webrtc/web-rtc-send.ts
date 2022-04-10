@@ -1,35 +1,42 @@
-import debug from "debug";
-import { Socket } from "socket.io-client";
-import { RestClientWebRtc } from "./types";
-import { WebRtcConnection } from "./WebRtcConnection";
+import debug from 'debug';
+import { Socket } from 'socket.io-client';
+import { JoinRoomRequest, REQUEST_JOIN_ROOM, RESPONSE_ROOM_JOINED } from '../../shared/ws-server-messages';
+import { RestClientWebRtc } from './types';
+import { WebRtcConnection } from './WebRtcConnection';
 
-const log = debug("webrtc:createConnectionSend");
+const log = debug('webrtc:createConnectionSend');
 
 export default async function connectWebRtc(
-  rest: RestClientWebRtc,
-  socket: Socket
+   screenName: string,
+   rest: RestClientWebRtc,
+   socket: Socket,
 ): Promise<WebRtcConnection> {
-  const connection = new WebRtcConnection(socket, rest);
+   const req: JoinRoomRequest = { screenName };
+   socket.emit(REQUEST_JOIN_ROOM, req);
 
-  const device = connection.device;
+   await new Promise((resolve) => {
+      socket.once(RESPONSE_ROOM_JOINED, resolve);
+   });
 
-  const rtpResult = await rest.getRouterCapabilities();
-  if (!rtpResult?.success)
-    throw new Error("Router capabilities could not be retrived from server.");
-  log("Received router capabilities %O", rtpResult);
+   const connection = new WebRtcConnection(socket, rest);
+   const device = connection.device;
 
-  await device.load({ routerRtpCapabilities: rtpResult.response });
+   const rtpResult = await rest.getRouterCapabilities();
+   if (!rtpResult?.success) throw new Error('Router capabilities could not be retrived from server.');
+   log('Received router capabilities %O', rtpResult);
 
-  const result = await rest.initializeConnection({
-    sctpCapabilities: device.sctpCapabilities,
-    rtpCapabilities: device.rtpCapabilities,
-  });
+   await device.load({ routerRtpCapabilities: rtpResult.response });
 
-  if (!result.success) {
-    throw new Error("Initialize connection failed, empty result.");
-  }
+   const result = await rest.initializeConnection({
+      sctpCapabilities: device.sctpCapabilities,
+      rtpCapabilities: device.rtpCapabilities,
+   });
 
-  log("Initialized device");
+   if (!result.success) {
+      throw new Error('Initialize connection failed, empty result.');
+   }
 
-  return connection;
+   log('Initialized device');
+
+   return connection;
 }

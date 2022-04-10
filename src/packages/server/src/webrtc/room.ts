@@ -8,7 +8,7 @@ import {
    TransportProduceResponse,
 } from '../shared/webrtc-types';
 import { SuccessOrError } from './../shared/communication-types';
-import { MediaKind, Router, WebRtcTransportOptions } from 'mediasoup/node/lib/types';
+import { MediaKind, Router, RtpCapabilities, WebRtcTransportOptions } from 'mediasoup/node/lib/types';
 import ClientMessenger from './client-messenger';
 import Connection from './connection';
 import { MediasoupMixer } from './mediasoup-mixer';
@@ -34,11 +34,15 @@ export default class Room {
       this.mixer = new MediasoupMixer(router, signal);
    }
 
+   get routerCapabilities(): RtpCapabilities {
+      return this.router.rtpCapabilities;
+   }
+
    /**
     * Add a new user to the room
     */
-   public addUser({ rtpCapabilities, sctpCapabilities }: InitializeConnectionRequest, userId: string) {
-      this.connections.set(userId, new Connection(userId, rtpCapabilities, sctpCapabilities));
+   public addUser(userId: string) {
+      this.connections.set(userId, new Connection(userId));
    }
 
    /**
@@ -78,6 +82,18 @@ export default class Room {
       throw 'Not implemented';
    }
 
+   public initializeConnection(info: InitializeConnectionRequest, userId: string): SuccessOrError {
+      const connection = this.connections.get(userId);
+      if (!connection) return { success: false, error: errors.userNotFound(userId) };
+
+      if (connection.initalizedInfo) {
+         return { success: false, error: errors.invalidOperation('Already initialized') };
+      }
+
+      connection.initalizedInfo = info;
+      return { success: true };
+   }
+
    /**
     * Initialize a new transport
     */
@@ -87,6 +103,8 @@ export default class Room {
    ): Promise<SuccessOrError<CreateTransportResponse>> {
       const connection = this.connections.get(userId);
       if (!connection) return { success: false, error: errors.userNotFound(userId) };
+
+      if (!connection.initalizedInfo) return { success: false, error: errors.invalidOperation('Not initialized') };
 
       if (connection.receiveTransport && consuming)
          return { success: false, error: errors.invalidOperation('Already has receive transport') };

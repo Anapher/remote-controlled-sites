@@ -1,7 +1,12 @@
 import { Button, ButtonGroup, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import React from 'react';
+import { useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Socket } from 'socket.io-client';
+import TokenRestClient from '../../../services/token-rest-client';
+import connectWebRtc from '../../../app/webrtc/web-rtc-send';
 import { ScreenContent, ScreenDto } from '../../../shared/Screen';
+import { JoinRoomRequest, REQUEST_JOIN_ROOM } from '../../../shared/ws-server-messages';
+import Token from '../hooks/useToken';
 import { selectScreens } from '../slice';
 
 function renderContent(content: ScreenContent | null) {
@@ -20,10 +25,13 @@ function renderContent(content: ScreenContent | null) {
 type Props = {
    onDelete: (screen: ScreenDto) => void;
    onEdit: (screen: ScreenDto) => void;
+   socket: Socket;
 };
 
-export default function ScreensTable({ onDelete, onEdit }: Props) {
+export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    const screens = useSelector(selectScreens);
+   const token = useContext(Token);
+   const [currentScreenShare, setCurrentScreenShare] = useState(null);
 
    const handleDeleteWithConfirm = (screen: ScreenDto) => {
       if (
@@ -36,6 +44,12 @@ export default function ScreensTable({ onDelete, onEdit }: Props) {
 
    const handleCopyUrl = (screen: ScreenDto) => {
       navigator.clipboard.writeText(window.location.origin + '/screens/' + screen.name);
+   };
+
+   const handleShareScreen = async (screen: ScreenDto) => {
+      socket.emit(REQUEST_JOIN_ROOM);
+      const client = new TokenRestClient(token);
+      const connection = await connectWebRtc(screen.name, client, socket);
    };
 
    return (
@@ -55,7 +69,7 @@ export default function ScreensTable({ onDelete, onEdit }: Props) {
                   <TableCell>
                      <ButtonGroup size="small">
                         <Button onClick={() => handleCopyUrl(x)}>Url kopieren</Button>
-                        <Button>Bildschirm teilen</Button>
+                        <Button onClick={() => handleShareScreen(x)}>Bildschirm teilen</Button>
                         <Button onClick={() => onEdit(x)}>Bearbeiten</Button>
                         <Button onClick={() => handleDeleteWithConfirm(x)}>Löschen</Button>
                      </ButtonGroup>

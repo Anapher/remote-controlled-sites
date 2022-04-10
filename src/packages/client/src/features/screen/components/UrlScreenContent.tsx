@@ -1,4 +1,3 @@
-import React from 'react';
 import { ScreenWebsiteContent } from '../../../shared/Screen';
 
 type Props = {

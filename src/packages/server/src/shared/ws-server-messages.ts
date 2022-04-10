@@ -1,11 +1,11 @@
 import { ScreenInfo } from './Screen';
-import { SctpCapabilities, RtpCapabilities } from 'mediasoup/node/lib/types';
 
 export const REQUEST_ALL_SCREENS = 'GET_SCREENS';
 export const REQUEST_PUT_SCREEN = 'PUT_SCREEN';
 export const REQUEST_DEL_SCREEN = 'DEL_SCREEN';
 
 export const REQUEST_JOIN_ROOM = 'JOIN_ROOM';
+export const RESPONSE_ROOM_JOINED = 'RESPONSE_ROOM_JOINED';
 
 export const RESPONSE_ALL_SCREENS = 'RETURN_SCREENS';
 export const SCREEN_UPDATED = 'SCREEN_UPDATED';
@@ -25,6 +25,4 @@ export type ScreensResponse = {
 
 export type JoinRoomRequest = {
    screenName: string;
-   sctpCapabilities: SctpCapabilities;
-   rtpCapabilities: RtpCapabilities;
 };

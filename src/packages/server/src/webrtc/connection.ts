@@ -1,7 +1,9 @@
 import { Consumer, Producer, RtpCapabilities, SctpCapabilities, Transport } from 'mediasoup/node/lib/types';
 
 export default class Connection {
-   constructor(public id: string, public rtpCapabilities: RtpCapabilities, public sctpCapabilities: SctpCapabilities) {}
+   constructor(public id: string) {}
+
+   public initalizedInfo: { rtpCapabilities: RtpCapabilities; sctpCapabilities: SctpCapabilities } | null = null;
 
    public receiveTransport: Transport | null = null;
    public sendTransport: Transport | null = null;

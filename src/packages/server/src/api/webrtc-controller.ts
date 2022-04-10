@@ -17,6 +17,21 @@ const checkRoom: (manager: WebRtcManager) => RequestHandler = (manager) => async
 };
 
 export default function configureApi(app: Express, manager: WebRtcManager) {
+   app.get('/api/webrtc/router-capabilities', authenticateToken, checkRoom(manager), (req, res) => {
+      const room = (req as any).room as Room;
+
+      const result = room.routerCapabilities;
+      res.json(result);
+   });
+
+   app.post('/api/webrtc/initialize-connection', authenticateToken, checkRoom(manager), async (req, res) => {
+      const room = (req as any).room as Room;
+      const user = (req as any).user as AuthUserInfo;
+
+      const result = room.initializeConnection(req.body, user.id);
+      res.json(result);
+   });
+
    app.post('/api/webrtc/create-transport', authenticateToken, checkRoom(manager), async (req, res) => {
       const room = (req as any).room as Room;
       const user = (req as any).user as AuthUserInfo;

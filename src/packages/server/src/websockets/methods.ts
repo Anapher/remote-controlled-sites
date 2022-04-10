@@ -10,6 +10,7 @@ import {
    REQUEST_JOIN_ROOM,
    REQUEST_PUT_SCREEN,
    RESPONSE_ALL_SCREENS,
+   RESPONSE_ROOM_JOINED,
    ScreensResponse,
    SCREEN_UPDATED,
 } from '../shared/ws-server-messages';
@@ -80,10 +81,9 @@ export default function registerMethods(io: Server, manager: WebRtcManager) {
          }
 
          socket.data.joinRoom = screen.name;
-         await manager.joinRoom(screen.name, userId, {
-            sctpCapabilities: req.sctpCapabilities,
-            rtpCapabilities: req.rtpCapabilities,
-         });
+         await manager.joinRoom(screen.name, userId);
+
+         socket.emit(RESPONSE_ROOM_JOINED);
       });
    });
 }
