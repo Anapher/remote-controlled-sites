@@ -1,4 +1,4 @@
-import { Axios } from 'axios';
+import axios, { Axios } from 'axios';
 import { RtpCapabilities } from 'mediasoup-client/lib/RtpParameters';
 import { SuccessOrError } from '../shared/communication-types';
 import {
@@ -16,7 +16,7 @@ export default class TokenRestClient implements RestClientWebRtc {
    private ax: Axios;
 
    constructor(token: string) {
-      this.ax = new Axios({ headers: { Authorization: 'Bearer ' + token } });
+      this.ax = axios.create({ headers: { Authorization: 'Bearer ' + token } });
    }
 
    async getRouterCapabilities(): Promise<SuccessOrError<RtpCapabilities>> {
@@ -28,14 +28,17 @@ export default class TokenRestClient implements RestClientWebRtc {
       const response = await this.ax.post('/api/webrtc/initialize-connection', request);
       return response.data;
    }
-   createTransport(request: CreateTransportRequest): Promise<SuccessOrError<CreateTransportResponse>> {
-      throw new Error('Method not implemented.');
+   async createTransport(request: CreateTransportRequest): Promise<SuccessOrError<CreateTransportResponse>> {
+      const response = await this.ax.post('/api/webrtc/create-transport', request);
+      return response.data;
    }
-   connectTransport(request: ConnectTransportRequest): Promise<SuccessOrError<never>> {
-      throw new Error('Method not implemented.');
+   async connectTransport(request: ConnectTransportRequest): Promise<SuccessOrError<never>> {
+      const response = await this.ax.post('/api/webrtc/connect-transport', request);
+      return response.data;
    }
-   transportProduce(request: TransportProduceRequest): Promise<SuccessOrError<TransportProduceResponse>> {
-      throw new Error('Method not implemented.');
+   async transportProduce(request: TransportProduceRequest): Promise<SuccessOrError<TransportProduceResponse>> {
+      const response = await this.ax.post('/api/webrtc/transport-produce', request);
+      return response.data;
    }
    changeStream(request: ChangeStreamRequest): Promise<SuccessOrError<never>> {
       throw new Error('Method not implemented.');

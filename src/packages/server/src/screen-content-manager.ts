@@ -4,6 +4,11 @@ import { ScreenContent, ScreenDto } from './shared/Screen';
 
 const screenContent = new Map<string, ScreenContent>();
 
+export function setScreenContent(name: string, content?: ScreenContent) {
+   if (content) screenContent.set(name, content);
+   else screenContent.delete(name);
+}
+
 /**
  * Get the content of a screen, keeping in memory data
  * @param screen the screen reference

@@ -14,6 +14,7 @@ import Connection from './connection';
 import { MediasoupMixer } from './mediasoup-mixer';
 import * as errors from '../errors';
 import Logger from '../utils/logger';
+import { setScreenContent } from '../screen-content-manager';
 
 const logger = new Logger('Room');
 
@@ -28,6 +29,7 @@ export default class Room {
       public name: string,
       private router: Router,
       private signal: ClientMessenger,
+      private contentChanged: (sharing: boolean) => void,
       private options: WebRtcTransportOptions,
       private maxIncomingBitrate?: number,
    ) {
@@ -86,11 +88,11 @@ export default class Room {
       const connection = this.connections.get(userId);
       if (!connection) return { success: false, error: errors.userNotFound(userId) };
 
-      if (connection.initalizedInfo) {
+      if (connection.initializedInfo) {
          return { success: false, error: errors.invalidOperation('Already initialized') };
       }
 
-      connection.initalizedInfo = info;
+      connection.initializedInfo = info;
       return { success: true };
    }
 
@@ -104,7 +106,7 @@ export default class Room {
       const connection = this.connections.get(userId);
       if (!connection) return { success: false, error: errors.userNotFound(userId) };
 
-      if (!connection.initalizedInfo) return { success: false, error: errors.invalidOperation('Not initialized') };
+      if (!connection.initializedInfo) return { success: false, error: errors.invalidOperation('Not initialized') };
 
       if (connection.receiveTransport && consuming)
          return { success: false, error: errors.invalidOperation('Already has receive transport') };
@@ -205,9 +207,15 @@ export default class Room {
          this.signal.notifyProducerScore(connection.id, { producerId: producer.id, score });
       });
 
+      producer.on('transportclose', () => {
+         this.contentChanged(false);
+      });
+
       connection.producers.set(producer.id, producer);
 
       this.mixer.addProducer({ producer, participantId: connection.id });
+
+      this.contentChanged(true);
 
       return { success: true, response: { id: producer.id } };
    }

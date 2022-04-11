@@ -101,10 +101,10 @@ export class MediasoupMixer {
       logger.debug('createConsumer() from %s to %s (producer id: %s)', participantId, connection.id, producer.id);
 
       if (
-         !connection.rtpCapabilities ||
+         !connection.initializedInfo?.rtpCapabilities ||
          !this.router.canConsume({
             producerId: producer.id,
-            rtpCapabilities: connection.rtpCapabilities,
+            rtpCapabilities: connection.initializedInfo.rtpCapabilities,
          })
       )
          return;
@@ -122,8 +122,8 @@ export class MediasoupMixer {
       try {
          consumer = await transport.consume({
             producerId: producer.id,
-            rtpCapabilities: connection.rtpCapabilities,
-            paused: true,
+            rtpCapabilities: connection.initializedInfo.rtpCapabilities,
+            paused: false,
          });
       } catch (error) {
          logger.warn('createConsumer() | transport.consume():%o', error);

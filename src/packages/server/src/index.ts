@@ -7,6 +7,8 @@ import WebRtcManager from './webrtc/webrtc-manager';
 import { Server } from 'socket.io';
 import http from 'http';
 import SocketIoClientMessenger from './websockets/socketio-client-messenger';
+import { getScreenInfo, setScreenContent } from './screen-content-manager';
+import { SCREEN_UPDATED } from './shared/ws-server-messages';
 
 main();
 
@@ -20,7 +22,19 @@ async function main() {
    const server = http.createServer(app);
    const io = new Server(server);
 
-   const manager = new WebRtcManager(workers, new SocketIoClientMessenger(io));
+   const updateRoomScreenShare = async (name: string, sharing: boolean) => {
+      console.log('update screen share', name, sharing);
+
+      if (sharing) {
+         setScreenContent(name, { type: 'screenshare' });
+      } else {
+         setScreenContent(name, undefined);
+      }
+
+      io.emit(SCREEN_UPDATED, await getScreenInfo(name));
+   };
+
+   const manager = new WebRtcManager(workers, new SocketIoClientMessenger(io), updateRoomScreenShare);
 
    configureApi(app, manager);
    configureWebSockets(io, manager);

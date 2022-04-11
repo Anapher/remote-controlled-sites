@@ -7,6 +7,13 @@ import { MediaKind, RtpParameters, Transport, Consumer } from 'mediasoup-client/
 import { EventSubscription, subscribeEvent, unsubscribeAll } from '../../utils/event-emitter-utils';
 import { ChangeStreamRequest, ProducerSource } from '../../shared/webrtc-types';
 import { RestClientWebRtc } from './types';
+import {
+   RESPONSE_CONSUMER_CLOSED,
+   RESPONSE_CONSUMER_CREATED,
+   RESPONSE_CONSUMER_PAUSED,
+   RESPONSE_CONSUMER_RESUMED,
+   RESPONSE_PRODUCER_CHANGED,
+} from '../../shared/ws-server-messages';
 
 type OnNewConsumerPayload = {
    participantId: string;
@@ -50,11 +57,11 @@ export class WebRtcConnection extends TypedEmitter {
       this.device = new Device();
 
       this.signalrSubscription.push(
-         subscribeEvent(connection, 'newConsumer', this.onNewConsumer.bind(this)),
-         subscribeEvent(connection, 'consumerClosed', this.onConsumerClosed.bind(this)),
-         subscribeEvent(connection, 'consumerPaused', this.onConsumerPaused.bind(this)),
-         subscribeEvent(connection, 'consumerResumed', this.onConsumerResumed.bind(this)),
-         subscribeEvent(connection, 'producerChanged', this.onProducerChanged.bind(this)),
+         subscribeEvent(connection, RESPONSE_CONSUMER_CREATED, this.onNewConsumer.bind(this)),
+         subscribeEvent(connection, RESPONSE_CONSUMER_CLOSED, this.onConsumerClosed.bind(this)),
+         subscribeEvent(connection, RESPONSE_CONSUMER_PAUSED, this.onConsumerPaused.bind(this)),
+         subscribeEvent(connection, RESPONSE_CONSUMER_RESUMED, this.onConsumerResumed.bind(this)),
+         subscribeEvent(connection, RESPONSE_PRODUCER_CHANGED, this.onProducerChanged.bind(this)),
       );
    }
 
@@ -127,6 +134,8 @@ export class WebRtcConnection extends TypedEmitter {
 
          this.consumers.set(id, consumer);
          log('[Consumer: %s] Consumer initialized successfully', id);
+
+         this.emit('newConsumer', consumer);
       } catch (error) {
          log('[Consumer: %s] Error on initializing consumer %O', id, error);
       }

@@ -18,6 +18,8 @@ export default async function connectWebRtc(
       socket.once(RESPONSE_ROOM_JOINED, resolve);
    });
 
+   console.log('Joined room');
+
    const connection = new WebRtcConnection(socket, rest);
    const device = connection.device;
 
@@ -25,7 +27,11 @@ export default async function connectWebRtc(
    if (!rtpResult?.success) throw new Error('Router capabilities could not be retrived from server.');
    log('Received router capabilities %O', rtpResult);
 
+   console.log(rtpResult);
+
    await device.load({ routerRtpCapabilities: rtpResult.response });
+
+   console.log('Loaded router capabilities');
 
    const result = await rest.initializeConnection({
       sctpCapabilities: device.sctpCapabilities,

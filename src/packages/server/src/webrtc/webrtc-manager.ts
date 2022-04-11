@@ -1,5 +1,4 @@
 import config from '../config';
-import { InitializeConnectionRequest } from '../shared/webrtc-types';
 import ClientMessenger from './client-messenger';
 import MediaSoupWorkers from './media-soup-workers';
 import Room from './room';
@@ -11,7 +10,11 @@ export default class WebRtcManager {
    private rooms = new Map<string, Promise<Room>>();
    private userToRoom = new Map<string, string>();
 
-   constructor(private workers: MediaSoupWorkers, private signal: ClientMessenger) {}
+   constructor(
+      private workers: MediaSoupWorkers,
+      private signal: ClientMessenger,
+      private roomContentChanged: (name: string, sharing: boolean) => void,
+   ) {}
 
    async createRoom(name: string): Promise<Room> {
       const assignedWorker = this.workers.getNextWorker();
@@ -21,6 +24,7 @@ export default class WebRtcManager {
          name,
          mediasoupRouter,
          this.signal,
+         (s) => this.roomContentChanged(name, s),
          config.webRtcTransport.options,
          config.webRtcTransport.maxIncomingBitrate,
       );

@@ -1,13 +1,14 @@
 import { Button, ButtonGroup, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Socket } from 'socket.io-client';
 import TokenRestClient from '../../../services/token-rest-client';
-import connectWebRtc from '../../../app/webrtc/web-rtc-send';
+import connectWebRtc from '../../../app/webrtc/web-rtc-connect';
 import { ScreenContent, ScreenDto } from '../../../shared/Screen';
-import { JoinRoomRequest, REQUEST_JOIN_ROOM } from '../../../shared/ws-server-messages';
 import Token from '../hooks/useToken';
 import { selectScreens } from '../slice';
+import { WebRtcConnection } from '../../../app/webrtc/WebRtcConnection';
+import { Producer } from 'mediasoup-client/lib/Producer';
 
 function renderContent(content: ScreenContent | null) {
    if (!content)
@@ -22,6 +23,13 @@ function renderContent(content: ScreenContent | null) {
    }
 }
 
+type CurrentScreenShareState = {
+   name: string;
+   connection: WebRtcConnection;
+   producer: Producer;
+   track: MediaStreamTrack;
+};
+
 type Props = {
    onDelete: (screen: ScreenDto) => void;
    onEdit: (screen: ScreenDto) => void;
@@ -31,7 +39,16 @@ type Props = {
 export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    const screens = useSelector(selectScreens);
    const token = useContext(Token);
-   const [currentScreenShare, setCurrentScreenShare] = useState(null);
+   const [currentScreenShare, setCurrentScreenShare] = useState<CurrentScreenShareState | null>(null);
+
+   useEffect(() => {
+      if (!currentScreenShare) return;
+
+      return () => {
+         currentScreenShare.connection.close();
+         currentScreenShare.track.stop();
+      };
+   }, [currentScreenShare]);
 
    const handleDeleteWithConfirm = (screen: ScreenDto) => {
       if (
@@ -47,9 +64,33 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    };
 
    const handleShareScreen = async (screen: ScreenDto) => {
-      socket.emit(REQUEST_JOIN_ROOM);
+      const constraints: MediaStreamConstraints = { video: { height: { ideal: 1080 }, frameRate: 25 } };
+      const stream = (await (navigator.mediaDevices as any).getDisplayMedia(constraints)) as MediaStream;
+
+      const track = stream.getVideoTracks()[0];
+
+      console.log('connect web rtc');
+
       const client = new TokenRestClient(token);
       const connection = await connectWebRtc(screen.name, client, socket);
+
+      console.log('webrtc connection created');
+
+      const transport = await connection.createSendTransport();
+      const producer = await transport.produce({
+         track,
+         appData: { source: 'screen' },
+      });
+
+      producer.on('transportclose', () => {});
+
+      producer.on('trackended', () => {});
+
+      setCurrentScreenShare({ track, producer, connection, name: screen.name });
+   };
+
+   const handleStopSharingScreen = () => {
+      setCurrentScreenShare(null);
    };
 
    return (
@@ -69,7 +110,13 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
                   <TableCell>
                      <ButtonGroup size="small">
                         <Button onClick={() => handleCopyUrl(x)}>Url kopieren</Button>
-                        <Button onClick={() => handleShareScreen(x)}>Bildschirm teilen</Button>
+                        {currentScreenShare?.name === x.name ? (
+                           <Button onClick={handleStopSharingScreen} color="secondary">
+                              Bildschirm nicht mehr teilen
+                           </Button>
+                        ) : (
+                           <Button onClick={() => handleShareScreen(x)}>Bildschirm teilen</Button>
+                        )}
                         <Button onClick={() => onEdit(x)}>Bearbeiten</Button>
                         <Button onClick={() => handleDeleteWithConfirm(x)}>Löschen</Button>
                      </ButtonGroup>
