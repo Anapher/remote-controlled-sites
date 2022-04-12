@@ -8,6 +8,7 @@ import {
    REQUEST_ALL_SCREENS,
    REQUEST_DEL_SCREEN,
    REQUEST_JOIN_ROOM,
+   REQUEST_LEAVE_ROOM,
    REQUEST_PUT_SCREEN,
    RESPONSE_ALL_SCREENS,
    RESPONSE_ROOM_JOINED,
@@ -84,6 +85,11 @@ export default function registerMethods(io: Server, manager: WebRtcManager) {
          await manager.joinRoom(screen.name, userId);
 
          socket.emit(RESPONSE_ROOM_JOINED);
+      });
+
+      socket.on(REQUEST_LEAVE_ROOM, async () => {
+         await manager.leaveRoom(userId);
+         socket.data.joinedRoom = undefined;
       });
    });
 }

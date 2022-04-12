@@ -64,6 +64,8 @@ export default class Room {
       for (const [, producer] of connection.producers) {
          this.mixer.removeProducer(producer.id);
 
+         this.contentChanged(false);
+
          producer.close();
       }
       for (const [, consumer] of connection.consumers) {

@@ -9,6 +9,7 @@ import Token from '../hooks/useToken';
 import { selectScreens } from '../slice';
 import { WebRtcConnection } from '../../../app/webrtc/WebRtcConnection';
 import { Producer } from 'mediasoup-client/lib/Producer';
+import { REQUEST_LEAVE_ROOM } from '../../../shared/ws-server-messages';
 
 function renderContent(content: ScreenContent | null) {
    if (!content)
@@ -47,8 +48,10 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
       return () => {
          currentScreenShare.connection.close();
          currentScreenShare.track.stop();
+
+         socket.emit(REQUEST_LEAVE_ROOM);
       };
-   }, [currentScreenShare]);
+   }, [currentScreenShare, socket]);
 
    const handleDeleteWithConfirm = (screen: ScreenDto) => {
       if (
@@ -82,9 +85,13 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
          appData: { source: 'screen' },
       });
 
-      producer.on('transportclose', () => {});
+      producer.on('transportclose', () => {
+         setCurrentScreenShare(null);
+      });
 
-      producer.on('trackended', () => {});
+      producer.on('trackended', () => {
+         setCurrentScreenShare(null);
+      });
 
       setCurrentScreenShare({ track, producer, connection, name: screen.name });
    };
