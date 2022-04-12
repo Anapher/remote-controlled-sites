@@ -66,6 +66,8 @@ export default function registerMethods(io: Server, manager: WebRtcManager) {
       }
 
       socket.on('disconnect', async () => {
+         console.log('Client disconnected');
+
          const room = socket.data.joinedRoom;
          if (room) {
             await manager.leaveRoom(userId);
@@ -81,7 +83,7 @@ export default function registerMethods(io: Server, manager: WebRtcManager) {
             return;
          }
 
-         socket.data.joinRoom = screen.name;
+         socket.data.joinedRoom = screen.name;
          await manager.joinRoom(screen.name, userId);
 
          socket.emit(RESPONSE_ROOM_JOINED);

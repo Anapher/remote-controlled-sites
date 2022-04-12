@@ -83,7 +83,7 @@ export default class Room {
    }
 
    public close() {
-      throw 'Not implemented';
+      this.router.close();
    }
 
    public initializeConnection(info: InitializeConnectionRequest, userId: string): SuccessOrError {
