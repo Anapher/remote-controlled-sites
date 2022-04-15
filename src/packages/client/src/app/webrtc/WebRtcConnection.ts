@@ -3,9 +3,8 @@ import { Socket } from 'socket.io-client';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { Device } from 'mediasoup-client';
 import { MediaKind, RtpParameters, Transport, Consumer } from 'mediasoup-client/lib/types';
-
 import { EventSubscription, subscribeEvent, unsubscribeAll } from '../../utils/event-emitter-utils';
-import { ChangeStreamRequest, ProducerSource } from '../../shared/webrtc-types';
+import { ProducerSource } from '../../shared/webrtc-types';
 import { RestClientWebRtc } from './types';
 import {
    RESPONSE_CONSUMER_CLOSED,
@@ -290,13 +289,5 @@ export class WebRtcConnection extends TypedEmitter {
       }
 
       return transport;
-   }
-
-   public async changeStream(request: ChangeStreamRequest): Promise<void> {
-      const result = await this.client.changeStream(request);
-      if (!result.success) {
-         log('Change stream %O failure: %O', request, result.error);
-         throw result.error;
-      }
    }
 }

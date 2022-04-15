@@ -2,12 +2,6 @@ import { MediaKind, RtpCapabilities, RtpParameters } from 'mediasoup-client/lib/
 import { SctpCapabilities, SctpParameters } from 'mediasoup-client/lib/SctpParameters';
 import { DtlsParameters, IceCandidate, IceParameters } from 'mediasoup-client/lib/Transport';
 
-export type ChangeStreamRequest = {
-   id: string;
-   type: 'producer' | 'consumer';
-   action: 'pause' | 'resume' | 'close';
-};
-
 export type ConsumerLayers = {
    /**
     * The spatial layer index (from 0 to N).
@@ -18,17 +12,6 @@ export type ConsumerLayers = {
     * The temporal layer index (from 0 to N).
     */
    temporalLayer?: number;
-};
-
-export type SetPreferredLayersRequest = {
-   consumerId: string;
-   layers: ConsumerLayers;
-};
-
-export type ChangeProducerSourceRequest = {
-   participantId: string;
-   source: ProducerSource;
-   action: 'pause' | 'resume' | 'close';
 };
 
 export type ProducerDevice = 'mic' | 'webcam' | 'screen';

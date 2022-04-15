@@ -1,21 +1,6 @@
-import {
-   DtlsParameters,
-   IceCandidate,
-   IceParameters,
-   SctpCapabilities,
-   SctpParameters,
-   MediaKind,
-   RtpCapabilities,
-   RtpParameters,
-} from 'mediasoup-client/lib/types';
-import { Transport } from 'mediasoup/node/lib/Transport';
-import { WebRtcTransport } from 'mediasoup/node/lib/WebRtcTransport';
-
-export type ChangeStreamRequest = {
-   id: string;
-   type: 'producer' | 'consumer';
-   action: 'pause' | 'resume' | 'close';
-};
+import { MediaKind, RtpCapabilities, RtpParameters } from 'mediasoup-client/lib/RtpParameters';
+import { SctpCapabilities, SctpParameters } from 'mediasoup-client/lib/SctpParameters';
+import { DtlsParameters, IceCandidate, IceParameters } from 'mediasoup-client/lib/Transport';
 
 export type ConsumerLayers = {
    /**
@@ -27,17 +12,6 @@ export type ConsumerLayers = {
     * The temporal layer index (from 0 to N).
     */
    temporalLayer?: number;
-};
-
-export type SetPreferredLayersRequest = {
-   consumerId: string;
-   layers: ConsumerLayers;
-};
-
-export type ChangeProducerSourceRequest = {
-   participantId: string;
-   source: ProducerSource;
-   action: 'pause' | 'resume' | 'close';
 };
 
 export type ProducerDevice = 'mic' | 'webcam' | 'screen';
@@ -64,7 +38,7 @@ export type CreateTransportRequest = {
 export type CreateTransportResponse = {
    id: string;
    iceParameters: IceParameters;
-   iceCandidates: WebRtcTransport['iceCandidates'];
+   iceCandidates: IceCandidate[];
    dtlsParameters: DtlsParameters;
    sctpParameters?: SctpParameters;
 };

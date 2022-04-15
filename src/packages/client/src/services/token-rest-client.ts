@@ -8,8 +8,6 @@ import {
    ConnectTransportRequest,
    TransportProduceRequest,
    TransportProduceResponse,
-   ChangeStreamRequest,
-   SetPreferredLayersRequest,
 } from '../shared/webrtc-types';
 import { RestClientWebRtc } from '../app/webrtc/types';
 export default class TokenRestClient implements RestClientWebRtc {
@@ -39,11 +37,5 @@ export default class TokenRestClient implements RestClientWebRtc {
    async transportProduce(request: TransportProduceRequest): Promise<SuccessOrError<TransportProduceResponse>> {
       const response = await this.ax.post('/api/webrtc/transport-produce', request);
       return response.data;
-   }
-   changeStream(request: ChangeStreamRequest): Promise<SuccessOrError<never>> {
-      throw new Error('Method not implemented.');
-   }
-   setConsumerLayers(request: SetPreferredLayersRequest): Promise<SuccessOrError<never>> {
-      throw new Error('Method not implemented.');
    }
 }
