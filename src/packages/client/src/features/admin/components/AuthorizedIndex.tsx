@@ -1,4 +1,4 @@
-import { Button, Container, Typography } from '@mui/material';
+import { Button, Container, Paper, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { sendDelScreen, sendPutScreen, sendRequestScreens } from '../../../app/useAdminWs';
@@ -44,12 +44,14 @@ export default function AuthorizedIndex({ socket }: Props) {
    };
 
    return (
-      <Container maxWidth="md" sx={{ p: 4 }}>
+      <Container maxWidth="md">
          <Typography variant="h4" textAlign="center" gutterBottom>
             Bildschirme
          </Typography>
 
-         <ScreensTable socket={socket} onDelete={handleDeleteScreen} onEdit={handleOpenDialogEdit} />
+         <Paper>
+            <ScreensTable socket={socket} onDelete={handleDeleteScreen} onEdit={handleOpenDialogEdit} />
+         </Paper>
          <Button onClick={handleOpenDialogCreate} sx={{ mt: 3 }} variant="contained">
             Neuen Bildschirm erstellen
          </Button>
