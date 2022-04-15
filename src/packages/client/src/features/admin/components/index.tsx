@@ -3,7 +3,6 @@ import { RootState } from '../../../app/store';
 import useAdminWs from '../../../app/useAdminWs';
 import ErrorScreen from '../../../components/ErrorScreen';
 import Loading from '../../../components/Loading';
-import Token from '../hooks/useToken';
 import AuthorizedIndex from './AuthorizedIndex';
 import Login from './Login';
 
@@ -17,9 +16,5 @@ export default function AdminIndex() {
    if (connectionError) return <ErrorScreen message="Ein Verbindungsfehler ist aufgetreten" />;
    if (!connected || !socket || !token) return <Loading message="Verbinde..." />;
 
-   return (
-      <Token.Provider value={token}>
-         <AuthorizedIndex socket={socket} />
-      </Token.Provider>
-   );
+   return <AuthorizedIndex socket={socket} />;
 }
