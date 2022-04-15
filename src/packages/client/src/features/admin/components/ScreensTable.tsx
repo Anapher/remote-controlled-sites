@@ -1,4 +1,14 @@
-import { Button, ButtonGroup, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import {
+   Button,
+   ButtonGroup,
+   Table,
+   TableBody,
+   TableCell,
+   TableHead,
+   TableRow,
+   Tooltip,
+   Typography,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Socket } from 'socket.io-client';
@@ -10,6 +20,9 @@ import { WebRtcConnection } from '../../../app/webrtc/WebRtcConnection';
 import { Producer } from 'mediasoup-client/lib/Producer';
 import { REQUEST_LEAVE_ROOM } from '../../../shared/ws-server-messages';
 import { RootState } from '../../../app/store';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import LinkIcon from '@mui/icons-material/Link';
 
 function renderContent(content: ScreenContent | null) {
    if (!content)
@@ -117,7 +130,6 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
                   <TableCell>{renderContent(x.content)}</TableCell>
                   <TableCell>
                      <ButtonGroup size="small">
-                        <Button onClick={() => handleCopyUrl(x)}>Url kopieren</Button>
                         {currentScreenShare?.name === x.name ? (
                            <Button onClick={handleStopSharingScreen} color="secondary">
                               Bildschirm nicht mehr teilen
@@ -125,8 +137,21 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
                         ) : (
                            <Button onClick={() => handleShareScreen(x)}>Bildschirm teilen</Button>
                         )}
-                        <Button onClick={() => onEdit(x)}>Bearbeiten</Button>
-                        <Button onClick={() => handleDeleteWithConfirm(x)}>Löschen</Button>
+                        <Tooltip title="Url kopieren">
+                           <Button onClick={() => handleCopyUrl(x)} aria-label="url kopieren">
+                              <LinkIcon />
+                           </Button>
+                        </Tooltip>
+                        <Tooltip title="Bearbeiten">
+                           <Button onClick={() => onEdit(x)} aria-label="bearbeiten">
+                              <EditIcon />
+                           </Button>
+                        </Tooltip>
+                        <Tooltip title="Löschen">
+                           <Button onClick={() => handleDeleteWithConfirm(x)} aria-label="löschen">
+                              <DeleteIcon />
+                           </Button>
+                        </Tooltip>
                      </ButtonGroup>
                   </TableCell>
                </TableRow>
