@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import AdminIndex from './features/admin/components';
 import ScreenRoute from './features/screen/components/ScreenRoute';

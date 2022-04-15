@@ -1,5 +1,5 @@
-import React from 'react';
+import Loading from '../../../components/Loading';
 
 export default function ConnectingView() {
-   return <div>Connecting...</div>;
+   return <Loading message="Connecting" />;
 }

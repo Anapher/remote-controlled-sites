@@ -1,25 +1,15 @@
-import {
-   Button,
-   ButtonGroup,
-   IconButton,
-   Table,
-   TableBody,
-   TableCell,
-   TableHead,
-   TableRow,
-   Typography,
-} from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { Button, ButtonGroup, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Socket } from 'socket.io-client';
 import TokenRestClient from '../../../services/token-rest-client';
 import connectWebRtc from '../../../app/webrtc/web-rtc-connect';
 import { ScreenContent, ScreenDto } from '../../../shared/Screen';
-import Token from '../hooks/useToken';
 import { selectScreens } from '../slice';
 import { WebRtcConnection } from '../../../app/webrtc/WebRtcConnection';
 import { Producer } from 'mediasoup-client/lib/Producer';
 import { REQUEST_LEAVE_ROOM } from '../../../shared/ws-server-messages';
+import { RootState } from '../../../app/store';
 
 function renderContent(content: ScreenContent | null) {
    if (!content)
@@ -49,7 +39,8 @@ type Props = {
 
 export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    const screens = useSelector(selectScreens);
-   const token = useContext(Token);
+
+   const token = useSelector((state: RootState) => state.admin.authToken)!;
    const [currentScreenShare, setCurrentScreenShare] = useState<CurrentScreenShareState | null>(null);
 
    useEffect(() => {

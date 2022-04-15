@@ -1,15 +1,19 @@
 import { Button, Container, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { sendDelScreen, sendPutScreen, sendRequestScreens } from '../../../app/useAdminWs';
 import { ScreenDto } from '../../../shared/Screen';
-import CreateEditDialog from './CreateEditDialog';
+import CreateEditDialog from './CreateEditScreenDialog';
 import ScreensTable from './ScreensTable';
 
 type Props = {
    socket: Socket;
 };
 
+/**
+ * The view after successful authorization, show available screens and
+ * provide methods to edit and create them
+ */
 export default function AuthorizedIndex({ socket }: Props) {
    const [dialogOpen, setDialogOpen] = useState(false);
    const [editingScreen, setEditingScreen] = useState<ScreenDto | null>(null);

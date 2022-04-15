@@ -12,8 +12,6 @@ export default function ScreenView({ id }: Props) {
    const token = useAuthToken(authAsUser);
    const socket = useAuthSocket(token);
 
-   console.log(token);
-
    if (!socket || !token) return <ConnectingView />;
 
    return <ScreenConnectedView id={id} token={token} socket={socket} />;

@@ -1,5 +1,5 @@
 import { Consumer } from 'mediasoup-client/lib/Consumer';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import connectWebRtc from '../../../app/webrtc/web-rtc-connect';
 import TokenRestClient from '../../../services/token-rest-client';

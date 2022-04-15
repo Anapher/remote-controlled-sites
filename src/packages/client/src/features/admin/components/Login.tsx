@@ -2,7 +2,7 @@ import { Box, Button, Paper, TextField, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../app/store';
-import { wrapForInputRef } from '../../../utils/reat-hook-form-utils';
+import { wrapForInputRef } from '../../../utils/react-hook-form-utils';
 import { authAction } from '../slice';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
