@@ -1,0 +1,12 @@
+version: "3.4"
+
+services:
+  remote-controlled-sites:
+    image: ${DOCKER_REGISTRY-}rcs
+    build:
+      context: .
+      args:
+        - MEDIASOUP_MIN_PORT=${MEDIASOUP_MIN_PORT}
+        - MEDIASOUP_MAX_PORT=${MEDIASOUP_MAX_PORT}
+    environment:
+      - MEDIASOUP_ANNOUNCED_IP=${ANNOUNCED_IP}
