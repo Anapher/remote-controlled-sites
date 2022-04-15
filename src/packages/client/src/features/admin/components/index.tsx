@@ -1,26 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../app/store';
 import useAdminWs from '../../../app/useAdminWs';
 import ErrorScreen from '../../../components/ErrorScreen';
 import Loading from '../../../components/Loading';
-import useAuthToken from '../../../hooks/useAuthToken';
-import { authAsAdmin } from '../../../services/auth';
 import Token from '../hooks/useToken';
 import AuthorizedIndex from './AuthorizedIndex';
+import Login from './Login';
 
 export default function AdminIndex() {
-   const [password, setPassword] = useState<string | null>(null);
-   const authFn = useMemo(() => (password ? () => authAsAdmin(password) : null), [password]);
-   const token = useAuthToken(authFn);
+   const token = useSelector((state: RootState) => state.admin.authToken);
 
    const { socket, connected, connectionError } = useAdminWs(token);
 
-   useEffect(() => {
-      const pw = prompt('Bitte geben Sie das Passwort ein');
-      setPassword(pw);
-   }, []);
+   if (!token) return <Login />;
 
    if (connectionError) return <ErrorScreen message="Ein Verbindungsfehler ist aufgetreten" />;
-
    if (!connected || !socket || !token) return <Loading message="Verbinde..." />;
 
    return (

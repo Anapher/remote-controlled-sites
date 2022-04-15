@@ -1,6 +1,13 @@
-import { MediaKind, RtpCapabilities, RtpParameters } from 'mediasoup-client/lib/RtpParameters';
-import { SctpCapabilities, SctpParameters } from 'mediasoup-client/lib/SctpParameters';
-import { DtlsParameters, IceCandidate, IceParameters } from 'mediasoup-client/lib/Transport';
+import {
+   DtlsParameters,
+   IceParameters,
+   SctpCapabilities,
+   SctpParameters,
+   MediaKind,
+   RtpCapabilities,
+   RtpParameters,
+} from 'mediasoup-client/lib/types';
+import { WebRtcTransport } from 'mediasoup/node/lib/WebRtcTransport';
 
 export type ConsumerLayers = {
    /**
@@ -38,7 +45,7 @@ export type CreateTransportRequest = {
 export type CreateTransportResponse = {
    id: string;
    iceParameters: IceParameters;
-   iceCandidates: IceCandidate[];
+   iceCandidates: WebRtcTransport['iceCandidates'];
    dtlsParameters: DtlsParameters;
    sctpParameters?: SctpParameters;
 };

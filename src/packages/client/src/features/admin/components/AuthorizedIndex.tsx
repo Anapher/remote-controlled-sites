@@ -46,7 +46,7 @@ export default function AuthorizedIndex({ socket }: Props) {
          </Typography>
 
          <ScreensTable socket={socket} onDelete={handleDeleteScreen} onEdit={handleOpenDialogEdit} />
-         <Button onClick={handleOpenDialogCreate} sx={{ mt: 3 }}>
+         <Button onClick={handleOpenDialogCreate} sx={{ mt: 3 }} variant="contained">
             Neuen Bildschirm erstellen
          </Button>
          {dialogOpen && (
