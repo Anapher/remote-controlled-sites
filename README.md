@@ -9,3 +9,14 @@ To transmit a video from and to other browsers without the use of plugins, the [
 As Mediasoup provides JavaScript bindings, the development backend is coded in TypeScript with an express.js server. Socket.io is used as a WebSocket wrapper to push events to the clients (for example when screen share started). Another problem that had to be solved is that WebRTC does not notice if connections drop, potentially leading to memory leaks. This was solved by assigning user ids by providing [JWTs](https://jwt.io/) that are required for socket and http connections. This way, for every request, the server can identify the user. As socket.io does notice when connections drop (by a heartbeat mechanism), the server requires the user to first connect the websocket before a webrtc connection can be established. If the socket connections drops, the user is automatically removed from webrtc.
 
 For the frontend, React together with TypeScript and [MUI](https://mui.com/) as design framework were selected, as they provide a convenient way to create a user friendly application.
+
+## Mediasoup
+I want to add a few words about mediasoup. Usually the documentation is of course the best way to understand a library, but mediasoup can be quite confusing and it took me some time to understand it. So here is a short overview:
+
+The smallest unit is a stream, which can be a single audio (e. g. microphone) or video (e. g. webcam or screen). To send a stream, the sender has to create a producer for that stream. On the server site, after the producer is initialized, consumers can be created for other clients to receive the stream.
+
+To create consumers or producers, you need a transport which is suitable, meaning for producing a send transport is required and for consuming a receive transport is needed. The mediasoup-mixer class written by me is taking care of consuming producers, basically you just add receive transports and producers and the consumers are automatically created for every transport.
+
+To initialize transports, you need a router on the server site. Only transports connected to the same router can consume each other.
+
+To create a router, you need a worker, which is basically a wrapper for a mediasoup process. We take the naive approach to create as many workers as we have cores to balance to load. Routers can also be connected to each other (to balance to load of one room between multiple cores), but that was not implemented here.
