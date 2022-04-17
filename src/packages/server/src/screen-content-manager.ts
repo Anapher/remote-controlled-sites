@@ -1,6 +1,5 @@
-import { ScreenInfo } from './../../client/src/shared/Screen';
 import { getScreen } from './database';
-import { ScreenContent, ScreenDto } from './shared/Screen';
+import { ScreenContent, ScreenDto, ScreenInfo } from './shared/Screen';
 
 const screenContent = new Map<string, ScreenContent>();
 

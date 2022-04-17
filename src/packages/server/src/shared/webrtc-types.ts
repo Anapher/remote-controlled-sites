@@ -6,7 +6,7 @@ import {
    MediaKind,
    RtpCapabilities,
    RtpParameters,
-} from 'mediasoup-client/lib/types';
+} from 'mediasoup/node/lib/types';
 import { WebRtcTransport } from 'mediasoup/node/lib/WebRtcTransport';
 
 export type ConsumerLayers = {
