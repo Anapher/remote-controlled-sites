@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io-client';
 import useScreenInfo from '../../../hooks/useScreenInfo';
 import ConnectingView from './ConnectingView';
+import NoContent from './NoContent';
 import ScreenShareScreenContent from './ScreenShareScreenContent';
 import UrlScreenContent from './UrlScreenContent';
 
@@ -17,7 +18,7 @@ export default function ScreenConnectedView({ id, token, socket }: Props) {
 
    console.log(screen);
 
-   if (!screen.content) return <div>Nothing to see here</div>;
+   if (!screen.content) return <NoContent />;
 
    switch (screen.content.type) {
       case 'url':
