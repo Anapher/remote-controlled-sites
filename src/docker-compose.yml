@@ -6,7 +6,11 @@ services:
     build:
       context: .
       args:
-        - MEDIASOUP_MIN_PORT=${MEDIASOUP_MIN_PORT}
-        - MEDIASOUP_MAX_PORT=${MEDIASOUP_MAX_PORT}
+        - MEDIASOUP_MIN_PORT=2000
+        - MEDIASOUP_MAX_PORT=2020
     environment:
       - MEDIASOUP_ANNOUNCED_IP=${ANNOUNCED_IP}
+    ports:
+      - "4000:4000"
+      - "2000-2020:2000-2020/udp"
+      - "2000-2020:2000-2020/tcp"
