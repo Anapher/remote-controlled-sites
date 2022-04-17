@@ -1,17 +1,23 @@
-FROM node:14 AS base
+FROM node:16 AS base
+
+# Install DEB dependencies and others.
+RUN \
+    set -x \
+    && apt-get update \
+    && apt-get install -y net-tools build-essential python3 python3-pip valgrind
 
 WORKDIR /app/packages/server
 COPY packages/server/package.json .
 COPY packages/server/yarn.lock .
 RUN yarn install
 
-FROM node:14 AS clientBuild
+FROM node:16 AS clientBuild
 
 WORKDIR /client
 COPY packages/client/package.json .
 COPY packages/client/yarn.lock .
 RUN yarn install
-
+COPY packages/client .
 RUN yarn build
 
 FROM base AS final
