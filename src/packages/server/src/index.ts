@@ -9,6 +9,7 @@ import http from 'http';
 import SocketIoClientMessenger from './websockets/socketio-client-messenger';
 import { getScreenInfo, setScreenContent } from './screen-content-manager';
 import { SCREEN_UPDATED } from './shared/ws-server-messages';
+import path from 'path';
 
 main();
 
@@ -18,6 +19,7 @@ async function main() {
 
    const app = express();
    app.use(express.json());
+   app.use(express.static('client'));
 
    const server = http.createServer(app);
    const io = new Server(server);
@@ -38,6 +40,10 @@ async function main() {
 
    configureApi(app, manager);
    configureWebSockets(io, manager);
+
+   app.get('*', function (request, response) {
+      response.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
+   });
 
    server.listen(config.http.port, () =>
       console.log(`Server is running on port: http://localhost:${config.http.port}`),
