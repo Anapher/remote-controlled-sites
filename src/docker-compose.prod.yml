@@ -1,0 +1,13 @@
+version: "3.4"
+
+services:
+  remote-controlled-sites:
+    image: ${DOCKER_REGISTRY-}rcs
+    build:
+      context: .
+      args:
+        - MEDIASOUP_MIN_PORT=${MEDIASOUP_MIN_PORT}
+        - MEDIASOUP_MAX_PORT=${MEDIASOUP_MAX_PORT}
+    environment:
+      - MEDIASOUP_ANNOUNCED_IP=${ANNOUNCED_IP}
+    network_mode: host # we need to export a large port range https://docs.docker.com/network/host/

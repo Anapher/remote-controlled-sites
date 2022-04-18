@@ -3,6 +3,31 @@
 ## About the project
 At Paderborn University, we were interested about how to make online learning more enjoyable and interactive for students. During our search, we discovered the [Vircadia](https://vircadia.com/) project, an open source metaverse that allows to have more natural conversations and hold presentations. Vircadia provides a simple web entity object that is basically a browser for the user. For our use case, we needed screen share capabilities that are easy to use, which resulted in this project. A user can "create" websites (called screens) that load an iframe by default and the user can easily start screensharing to replace any of these websites with his screen. It was important that no interaction by a user inside the game is required.
 
+## Getting Started
+### Running on localhost with Docker Compose
+1. Clone the repo
+   ```sh
+   git clone https://github.com/Anapher/remote-controlled-sites.git
+   ```
+   
+2. Got to src directory
+   ```sh
+   cd src/
+   ```
+
+3. Start docker-compose
+   ```sh
+   docker-compose up --build
+   ```
+
+Default password is `test` for the admin panel, just go to `http://localhost:4000`
+
+### Notes for production environments
+- Change the password and token secret in `packages/server/config.ts`
+- Use `docker-compose.prod.yml` which has as `network_mode` [host](https://docs.docker.com/network/host/) configured as Docker has problems exporting large port ranges, which are needed for mediasoup
+- Configure in `.env` the startup parameters, especially the `ANNOUNCED_IP` as the ip address of the server (not the domain name, it must be an ip address!)
+- Forward the port for the frontend and especially forward the mediasoup ports for tcp and udp
+
 ## Infrastructure and Design
 To transmit a video from and to other browsers without the use of plugins, the [WebRTC](https://webrtc.org/) standard can be used. Unfortunately, this standard only allows peer-to-peer connections, which is not feasible for a bigger amount of users (many websites cite 6 users as maximum), as the participant providing the video stream has to transmit it to everyone himself. In order to skip this limitation, an SFU can be used, which acts as a central server that distributes the streams. For this tool, [Mediasoup](https://mediasoup.org/) was selected as the SFU.
 
