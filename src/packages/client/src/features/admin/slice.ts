@@ -24,6 +24,9 @@ export const adminSlice = createSlice({
       setScreens(state, { payload }: PayloadAction<ScreenInfo[]>) {
          state.screens = payload;
       },
+      setScreen(state, { payload }: PayloadAction<ScreenInfo>) {
+         state.screens = state.screens?.map((x) => (x.name === payload.name ? payload : x)) ?? null;
+      },
       setToken(state, { payload }: PayloadAction<string | null>) {
          state.authToken = payload;
       },
@@ -36,7 +39,7 @@ export const adminSlice = createSlice({
    },
 });
 
-export const { setScreens } = adminSlice.actions;
+export const { setScreens, setScreen } = adminSlice.actions;
 
 export const selectScreens = (state: RootState) => state.admin.screens;
 

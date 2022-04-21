@@ -35,6 +35,10 @@ function renderContent(content: ScreenContent | null) {
    if (content.type === 'url') {
       return <Typography fontSize="inherit">{content.url}</Typography>;
    }
+
+   if (content.type === 'screenshare') {
+      return <Typography fontSize="inherit">Bildschirm wird geteilt</Typography>;
+   }
 }
 
 type CurrentScreenShareState = {
@@ -135,7 +139,9 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
                               Bildschirm nicht mehr teilen
                            </Button>
                         ) : (
-                           <Button onClick={() => handleShareScreen(x)}>Bildschirm teilen</Button>
+                           <Button onClick={() => handleShareScreen(x)} disabled={x.content?.type === 'screenshare'}>
+                              Bildschirm teilen
+                           </Button>
                         )}
                         <Tooltip title="Url kopieren">
                            <Button onClick={() => handleCopyUrl(x)} aria-label="url kopieren">

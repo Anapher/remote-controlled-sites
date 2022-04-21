@@ -6,10 +6,11 @@ import {
    REQUEST_PUT_SCREEN,
    RESPONSE_ALL_SCREENS,
    ScreensResponse,
+   SCREEN_UPDATED,
 } from '../shared/ws-server-messages';
 import { io, Socket } from 'socket.io-client';
-import { setScreens } from '../features/admin/slice';
-import { ScreenDto } from '../shared/Screen';
+import { setScreen, setScreens } from '../features/admin/slice';
+import { ScreenDto, ScreenInfo } from '../shared/Screen';
 
 export default function useAdminWs(token?: string | null): {
    socket: Socket | null;
@@ -29,9 +30,11 @@ export default function useAdminWs(token?: string | null): {
       const sock = io({ auth: { token } });
 
       const allScreensHandler = (data: ScreensResponse) => {
-         console.log('receive screens', data);
-
          dispatch(setScreens(data.screens));
+      };
+
+      const updateScreenHandler = (data: ScreenInfo) => {
+         dispatch(setScreen(data));
       };
 
       const connectedHandler = () => {
@@ -48,6 +51,7 @@ export default function useAdminWs(token?: string | null): {
       };
 
       sock.on(RESPONSE_ALL_SCREENS, allScreensHandler);
+      sock.on(SCREEN_UPDATED, updateScreenHandler);
 
       sock.io.on('open', connectedHandler);
       sock.io.on('close', disconnectedHandler);
@@ -60,6 +64,7 @@ export default function useAdminWs(token?: string | null): {
       return () => {
          sock.disconnect();
          sock.off(RESPONSE_ALL_SCREENS, allScreensHandler);
+         sock.off(SCREEN_UPDATED, updateScreenHandler);
          sock.io.off('open', connectedHandler);
          sock.io.off('close', disconnectedHandler);
          sock.io.off('close', connectionErrorHandler);
