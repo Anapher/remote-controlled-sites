@@ -224,6 +224,7 @@ export default class Room {
 
    private verifyProducerSource(kind: MediaKind, source: ProducerSource): boolean {
       if (source === 'mic' && kind === 'audio') return true;
+      if (source === 'sys-audio' && kind === 'audio') return true;
       if (source === 'screen' && kind === 'video') return true;
       if (source === 'webcam' && kind === 'video') return true;
 

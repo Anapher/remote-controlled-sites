@@ -14,7 +14,7 @@ export type ConsumerLayers = {
    temporalLayer?: number;
 };
 
-export type ProducerDevice = 'mic' | 'webcam' | 'screen';
+export type ProducerDevice = 'mic' | 'webcam' | 'screen' | 'sys-audio';
 export type ProducerSource = ProducerDevice;
 
 export const ProducerDevices: ProducerDevice[] = ['mic', 'webcam', 'screen'];

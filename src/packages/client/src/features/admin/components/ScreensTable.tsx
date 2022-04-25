@@ -85,7 +85,7 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    };
 
    const handleShareScreen = async (screen: ScreenDto) => {
-      const constraints: MediaStreamConstraints = { video: { height: { ideal: 1080 }, frameRate: 25 } };
+      const constraints: MediaStreamConstraints = { video: { height: { ideal: 1080 }, frameRate: 25 }, audio: true };
       const stream = (await (navigator.mediaDevices as any).getDisplayMedia(constraints)) as MediaStream;
 
       const track = stream.getVideoTracks()[0];
@@ -110,6 +110,16 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
       producer.on('trackended', () => {
          setCurrentScreenShare(null);
       });
+
+      const audioTracks = stream.getAudioTracks();
+      if (audioTracks.length > 0) {
+         const audioTrack = audioTracks[0];
+
+         await transport.produce({
+            track: audioTrack,
+            appData: { source: 'sys-audio' },
+         });
+      }
 
       setCurrentScreenShare({ track, producer, connection, name: screen.name });
    };
