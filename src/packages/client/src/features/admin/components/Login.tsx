@@ -35,6 +35,7 @@ export default function Login() {
             <form onSubmit={handleSubmit(handleLogin)}>
                <Box display="flex" flexDirection="row" alignItems="center">
                   <TextField
+                     autoFocus
                      disabled={isLoggingIn}
                      label="Password"
                      type="password"
