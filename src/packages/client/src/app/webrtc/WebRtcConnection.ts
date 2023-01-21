@@ -209,11 +209,11 @@ export class WebRtcConnection extends TypedEmitter {
                log('[Transport: %s] Remote transport connection response, success: %s', transport.id, response.success);
 
                if (response.success) callback();
-               else errback();
+               else errback(response.error as any);
             })
             .catch((err) => {
                log('[Transport: %s] Remote transport connection failed: %O', transport.id, err);
-               errback();
+               errback(err);
             });
       });
 
@@ -232,11 +232,11 @@ export class WebRtcConnection extends TypedEmitter {
                callback({ id: result.response.id });
             } else {
                log('[Transport: %s] Response failure: %O', transport.id, result.error);
-               errback(result.error);
+               errback(result.error as any);
             }
          } catch (error) {
             log('[Transport: %s] Request failure: %O', transport.id, error);
-            errback(error);
+            errback(error as Error);
          }
       });
 
@@ -272,11 +272,11 @@ export class WebRtcConnection extends TypedEmitter {
                );
 
                if (response.success) callback();
-               else errback(response.error);
+               else errback(response.error as any);
             })
             .catch((err) => {
                log('[Transport: %s] Remote receive transport connection failed: %O', transport.id, err);
-               errback();
+               errback(err);
             });
       });
 
