@@ -23,6 +23,7 @@ import { RootState } from '../../../app/store';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LinkIcon from '@mui/icons-material/Link';
+import ShareVideoDialog from './ShareVideoDialog';
 
 function renderContent(content: ScreenContent | null) {
    if (!content)
@@ -56,6 +57,9 @@ type Props = {
 
 export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    const screens = useSelector(selectScreens);
+
+   const [shareVideoOpen, setShareVideoOpen] = useState(false);
+   const [shareVideoScreenName, setShareVideoScreenName] = useState('');
 
    const token = useSelector((state: RootState) => state.admin.authToken)!;
    const [currentScreenShare, setCurrentScreenShare] = useState<CurrentScreenShareState | null>(null);
@@ -128,8 +132,20 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
       setCurrentScreenShare(null);
    };
 
+   const handleOpenShareVideo = (name: string) => {
+      setShareVideoScreenName(name);
+      setShareVideoOpen(true);
+   };
+   const handleCloseShareVideo = () => setShareVideoOpen(false);
+
    return (
       <Table>
+         <ShareVideoDialog
+            open={shareVideoOpen}
+            onClose={handleCloseShareVideo}
+            socket={socket}
+            screenInfo={screens?.find((x) => x.name === shareVideoScreenName)}
+         />
          <TableHead>
             <TableRow>
                <TableCell>Name</TableCell>
@@ -153,6 +169,7 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
                               Bildschirm teilen
                            </Button>
                         )}
+                        <Button onClick={() => handleOpenShareVideo(x.name)}>Video teilen</Button>
                         <Tooltip title="Url kopieren">
                            <Button onClick={() => handleCopyUrl(x)} aria-label="url kopieren">
                               <LinkIcon />

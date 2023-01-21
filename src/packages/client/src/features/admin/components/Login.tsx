@@ -7,7 +7,7 @@ import { authAction } from '../slice';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-const AuthFormSchema = z.object({ password: z.string().nonempty() });
+const AuthFormSchema = z.object({ password: z.string().min(1) });
 
 type AuthForm = z.infer<typeof AuthFormSchema>;
 

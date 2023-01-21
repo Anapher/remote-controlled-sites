@@ -11,27 +11,39 @@ export const ScreenSchema = z.object({
    defaultContent: z.string().url().optional().or(emptyStringToUndefined),
 });
 
+export const ScreenControlledVideoSchema = z.object({
+   type: z.literal('controlled-video'),
+   url: z.string().url().min(1),
+   paused: z.boolean(),
+   startTime: z.number().min(1),
+   startPosition: z.number().int(),
+});
+
+export const ScreenWebsiteContentSchema = z.object({
+   type: z.literal('url'),
+   url: z.string().url().min(1),
+});
+
+export const ScreenShareContentSchema = z.object({
+   type: z.literal('screenshare'),
+});
+
+export const ScreenContentSchema = z.discriminatedUnion('type', [
+   ScreenControlledVideoSchema,
+   ScreenWebsiteContentSchema,
+   ScreenShareContentSchema,
+]);
+
 export type ScreenDto = z.infer<typeof ScreenSchema>;
 
 export type ScreenInfo = ScreenDto & {
    content: ScreenContent | null;
 };
 
-export type ScreenContent = ScreenWebsiteContent | ScreenshareContent;
+export type ScreenContent = z.infer<typeof ScreenContentSchema>;
 
-export type ScreenWebsiteContent = {
-   type: 'url';
-   url: string;
-};
+export type ScreenWebsiteContent = z.infer<typeof ScreenWebsiteContentSchema>;
 
-export type ScreenshareContent = {
-   type: 'screenshare';
-};
+export type ScreenshareContent = z.infer<typeof ScreenShareContentSchema>;
 
-export type ScreenControlledVideo = {
-   type: 'controlled-video';
-   url: string;
-   paused: boolean;
-   startTime: string;
-   startPosition: number;
-};
+export type ScreenControlledVideo = z.infer<typeof ScreenControlledVideoSchema>;

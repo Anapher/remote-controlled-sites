@@ -1,15 +1,18 @@
-import { ADMIN_ROOM_NAME, ConnectionRoomName, ScreenRoomName } from './consts';
+import { ScreenContent } from './../shared/Screen';
+import { ADMIN_ROOM_NAME, ConnectionRoomName } from './consts';
 import { Server } from 'socket.io';
 import { deleteScreen, getAllScreens, getScreen, setScreen } from '../database';
-import { getScreenContent, getScreenInfo } from '../screen-content-manager';
-import { ScreenDto, ScreenInfo, ScreenSchema } from '../shared/Screen';
+import { getScreenContent, getScreenInfo, setScreenContent } from '../screen-content-manager';
+import { ScreenControlledVideoSchema, ScreenDto, ScreenInfo, ScreenSchema } from '../shared/Screen';
 import {
    JoinRoomRequest,
+   PutScreenContentRequest,
    REQUEST_ALL_SCREENS,
    REQUEST_DEL_SCREEN,
    REQUEST_JOIN_ROOM,
    REQUEST_LEAVE_ROOM,
    REQUEST_PUT_SCREEN,
+   REQUEST_PUT_SCREEN_CONTENT,
    RESPONSE_ALL_SCREENS,
    RESPONSE_ROOM_JOINED,
    ScreensResponse,
@@ -60,6 +63,24 @@ export default function registerMethods(io: Server, manager: WebRtcManager) {
             const result = ScreenSchema.parse({ name });
             await deleteScreen(result.name);
             updateScreens();
+         });
+
+         socket.on(REQUEST_PUT_SCREEN_CONTENT, async (dto: PutScreenContentRequest) => {
+            let result: ScreenContent;
+            try {
+               result = ScreenControlledVideoSchema.parse(dto.content);
+            } catch (error) {
+               console.error('[REQUEST_PUT_SCREEN_CONTENT] Validation failed', error);
+               return;
+            }
+
+            const screen = await getScreen(dto.name);
+            if (!screen) return;
+
+            setScreenContent(dto.name, result);
+
+            updateScreens();
+            io.emit(SCREEN_UPDATED, await getScreenInfo(dto.name));
          });
 
          socket.join(ADMIN_ROOM_NAME);

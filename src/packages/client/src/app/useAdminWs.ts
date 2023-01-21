@@ -1,3 +1,4 @@
+import { PutScreenContentRequest, REQUEST_PUT_SCREEN_CONTENT } from './../shared/ws-server-messages';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
@@ -84,4 +85,8 @@ export function sendPutScreen(socket: Socket, screen: ScreenDto) {
 
 export function sendDelScreen(socket: Socket, name: string) {
    socket.emit(REQUEST_DEL_SCREEN, name);
+}
+
+export function sendPutScreenContent(socket: Socket, dto: PutScreenContentRequest) {
+   socket.emit(REQUEST_PUT_SCREEN_CONTENT, dto);
 }
