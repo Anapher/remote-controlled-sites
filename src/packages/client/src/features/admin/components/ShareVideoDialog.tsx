@@ -35,7 +35,6 @@ export default function ShareVideoDialog({ open, onClose, socket, screenInfo }: 
          content: {
             paused: true,
             startPosition: 0,
-            startTime: new Date().getTime(),
             type: 'controlled-video',
             url: data.url,
          },

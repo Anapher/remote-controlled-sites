@@ -1,0 +1,1 @@
+export const TOLERATED_POSITION_DIFF = 400;
