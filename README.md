@@ -1,7 +1,7 @@
 # Remote Controlled Sites
 
 ## About the project
-At Paderborn University, we were interested about how to make online learning more enjoyable and interactive for students. During our search, we discovered the [Vircadia](https://vircadia.com/) project, an open source metaverse that allows to have more natural conversations and hold presentations. Vircadia provides a simple web entity object that is basically a browser for the user. For our use case, we needed screen share capabilities that are easy to use, which resulted in this project. A user can "create" websites (called screens) that load an iframe by default and the user can easily start screensharing to replace any of these websites with his screen. It was important that no interaction by a user inside the game is required.
+We were interested about how to make online learning more enjoyable and interactive for students. During our search, we discovered the [Vircadia](https://vircadia.com/) project, an open source metaverse that allows to have more natural conversations and hold presentations. Vircadia provides a simple web entity object that is basically a browser for the user. For our use case, we needed screen share capabilities that are easy to use, which resulted in this project. A user can "create" websites (called screens) that load an iframe by default and the user can easily start screensharing to replace any of these websites with his screen. It was important that no interaction by a user inside the game is required.
 
 ## Getting Started
 ### Running on localhost with Docker Compose
