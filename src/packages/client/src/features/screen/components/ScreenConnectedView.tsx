@@ -1,5 +1,7 @@
+import { useQuery } from '@tanstack/react-query';
 import { Socket } from 'socket.io-client';
-import useScreenInfo from '../../../hooks/useScreenInfo';
+import useQueryClientUpdateScreen from '../../../hooks/useScreenInfo';
+import { fetchScreen } from '../../../services/screen';
 import ConnectingView from './ConnectingView';
 import NoContent from './NoContent';
 import ScreenControlledVideoContent from './ScreenControlledVideoContent';
@@ -13,12 +15,14 @@ type Props = {
 };
 
 export default function ScreenConnectedView({ id, token, socket }: Props) {
-   const screen = useScreenInfo(id, token, socket);
+   const { data: screen, isFetching } = useQuery({
+      queryKey: ['screen', id],
+      queryFn: () => fetchScreen({ token, screenName: id }),
+   });
 
-   if (!screen) return <ConnectingView />;
+   useQueryClientUpdateScreen(id, socket);
 
-   console.log(screen);
-
+   if (!screen || isFetching) return <ConnectingView />;
    if (!screen.content) return <NoContent />;
 
    switch (screen.content.type) {

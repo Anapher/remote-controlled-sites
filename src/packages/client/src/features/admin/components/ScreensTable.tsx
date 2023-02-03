@@ -15,7 +15,6 @@ import { Socket } from 'socket.io-client';
 import TokenRestClient from '../../../services/token-rest-client';
 import connectWebRtc from '../../../app/webrtc/web-rtc-connect';
 import { ScreenContent, ScreenDto } from '../../../shared/Screen';
-import { selectScreens } from '../slice';
 import { WebRtcConnection } from '../../../app/webrtc/WebRtcConnection';
 import { Producer } from 'mediasoup-client/lib/Producer';
 import { REQUEST_LEAVE_ROOM } from '../../../shared/ws-server-messages';
@@ -24,6 +23,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LinkIcon from '@mui/icons-material/Link';
 import ShareVideoDialog from './ShareVideoDialog';
+import { useQuery } from '@tanstack/react-query';
+import { fetchAllScreens } from '../../../services/screen';
 
 function renderContent(content: ScreenContent | null) {
    if (!content)
@@ -56,7 +57,7 @@ type Props = {
 };
 
 export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
-   const screens = useSelector(selectScreens);
+   const { data } = useQuery({ queryKey: ['all_screens'], queryFn: fetchAllScreens });
 
    const [shareVideoOpen, setShareVideoOpen] = useState(false);
    const [shareVideoScreenName, setShareVideoScreenName] = useState('');
@@ -144,7 +145,7 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
             open={shareVideoOpen}
             onClose={handleCloseShareVideo}
             socket={socket}
-            screenInfo={screens?.find((x) => x.name === shareVideoScreenName)}
+            screenInfo={data?.screens.find((x) => x.name === shareVideoScreenName)}
          />
          <TableHead>
             <TableRow>
@@ -154,7 +155,7 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
             </TableRow>
          </TableHead>
          <TableBody>
-            {screens?.map((x) => (
+            {data?.screens.map((x) => (
                <TableRow key={x.name}>
                   <TableCell>{x.name}</TableCell>
                   <TableCell>{renderContent(x.content)}</TableCell>

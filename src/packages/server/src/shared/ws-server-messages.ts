@@ -1,10 +1,5 @@
 import { ScreenContent, ScreenInfo } from './Screen';
 
-export const REQUEST_ALL_SCREENS = 'GET_SCREENS';
-export const REQUEST_PUT_SCREEN = 'PUT_SCREEN';
-export const REQUEST_DEL_SCREEN = 'DEL_SCREEN';
-export const REQUEST_PUT_SCREEN_CONTENT = 'PUT_SCREEN_CONTENT';
-
 export const REQUEST_JOIN_ROOM = 'JOIN_ROOM';
 export const RESPONSE_ROOM_JOINED = 'RESPONSE_ROOM_JOINED';
 

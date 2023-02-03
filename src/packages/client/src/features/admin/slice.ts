@@ -1,17 +1,14 @@
 import { createSlice, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import { authAsAdmin } from '../../services/auth';
-import { ScreenInfo } from '../../shared/Screen';
 
 interface AdminState {
-   screens: ScreenInfo[] | null;
    authToken: string | null;
    isLoggingIn: boolean;
    authError: string | null;
 }
 
 const initialState: AdminState = {
-   screens: null,
    authToken: null,
    isLoggingIn: false,
    authError: null,
@@ -21,12 +18,6 @@ export const adminSlice = createSlice({
    name: 'admin',
    initialState,
    reducers: {
-      setScreens(state, { payload }: PayloadAction<ScreenInfo[]>) {
-         state.screens = payload;
-      },
-      setScreen(state, { payload }: PayloadAction<ScreenInfo>) {
-         state.screens = state.screens?.map((x) => (x.name === payload.name ? payload : x)) ?? null;
-      },
       setToken(state, { payload }: PayloadAction<string | null>) {
          state.authToken = payload;
       },
@@ -38,10 +29,6 @@ export const adminSlice = createSlice({
       },
    },
 });
-
-export const { setScreens, setScreen } = adminSlice.actions;
-
-export const selectScreens = (state: RootState) => state.admin.screens;
 
 export const authAction: (password: string) => ThunkAction<Promise<void>, RootState, any, any> = (password) => {
    return async (dispatch) => {

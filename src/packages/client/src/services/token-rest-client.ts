@@ -26,14 +26,17 @@ export default class TokenRestClient implements RestClientWebRtc {
       const response = await this.ax.post('/api/webrtc/initialize-connection', request);
       return response.data;
    }
+
    async createTransport(request: CreateTransportRequest): Promise<SuccessOrError<CreateTransportResponse>> {
       const response = await this.ax.post('/api/webrtc/create-transport', request);
       return response.data;
    }
+
    async connectTransport(request: ConnectTransportRequest): Promise<SuccessOrError<never>> {
       const response = await this.ax.post('/api/webrtc/connect-transport', request);
       return response.data;
    }
+
    async transportProduce(request: TransportProduceRequest): Promise<SuccessOrError<TransportProduceResponse>> {
       const response = await this.ax.post('/api/webrtc/transport-produce', request);
       return response.data;

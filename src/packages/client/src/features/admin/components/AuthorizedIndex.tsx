@@ -1,7 +1,10 @@
 import { Button, Container, Paper, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Socket } from 'socket.io-client';
-import { sendDelScreen, sendPutScreen, sendRequestScreens } from '../../../app/useAdminWs';
+import { RootState } from '../../../app/store';
+import { createScreen, deleteScreen } from '../../../services/screen';
 import { ScreenDto } from '../../../shared/Screen';
 import CreateEditDialog from './CreateEditScreenDialog';
 import ScreensTable from './ScreensTable';
@@ -17,10 +20,15 @@ type Props = {
 export default function AuthorizedIndex({ socket }: Props) {
    const [dialogOpen, setDialogOpen] = useState(false);
    const [editingScreen, setEditingScreen] = useState<ScreenDto | null>(null);
+   const token = useSelector((state: RootState) => state.admin.authToken)!;
 
-   useEffect(() => {
-      sendRequestScreens(socket);
-   }, [socket]);
+   const createScreenMutation = useMutation({
+      mutationFn: createScreen,
+   });
+
+   const deleteScreenMutation = useMutation({
+      mutationFn: deleteScreen,
+   });
 
    const handleCloseDialog = () => setDialogOpen(false);
 
@@ -35,12 +43,12 @@ export default function AuthorizedIndex({ socket }: Props) {
    };
 
    const handleCreate = (data: ScreenDto) => {
-      sendPutScreen(socket, data);
+      createScreenMutation.mutate({ dto: data, token });
       handleCloseDialog();
    };
 
    const handleDeleteScreen = (data: ScreenDto) => {
-      sendDelScreen(socket, data.name);
+      deleteScreenMutation.mutate({ screenName: data.name, token });
    };
 
    return (

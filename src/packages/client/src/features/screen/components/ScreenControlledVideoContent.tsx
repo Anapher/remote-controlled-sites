@@ -13,6 +13,8 @@ export default function ScreenControlledVideoContent({ content }: Props) {
    const player = useRef<ReactPlayer>(null);
 
    const handleOnProgress = (args: OnProgressProps) => {
+      if (content.paused) return;
+
       const startPosition = Math.round(new Date().getTime() - args.playedSeconds * 1000);
 
       if (Math.abs(content.startPosition - startPosition) > TOLERATED_POSITION_DIFF) {
@@ -31,6 +33,7 @@ export default function ScreenControlledVideoContent({ content }: Props) {
          width="100%"
          playing={!content.paused}
          onProgress={handleOnProgress}
+         muted
          ref={player}
       />
    );

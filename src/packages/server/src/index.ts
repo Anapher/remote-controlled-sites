@@ -38,7 +38,7 @@ async function main() {
 
    const manager = new WebRtcManager(workers, new SocketIoClientMessenger(io), updateRoomScreenShare);
 
-   configureApi(app, manager);
+   configureApi(app, io, manager);
    configureWebSockets(io, manager);
 
    app.get('*', function (request, response) {

@@ -1,24 +1,15 @@
-import { PutScreenContentRequest, REQUEST_PUT_SCREEN_CONTENT } from './../shared/ws-server-messages';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import {
-   REQUEST_ALL_SCREENS,
-   REQUEST_DEL_SCREEN,
-   REQUEST_PUT_SCREEN,
-   RESPONSE_ALL_SCREENS,
-   ScreensResponse,
-   SCREEN_UPDATED,
-} from '../shared/ws-server-messages';
 import { io, Socket } from 'socket.io-client';
-import { setScreen, setScreens } from '../features/admin/slice';
-import { ScreenDto, ScreenInfo } from '../shared/Screen';
+import { ScreenInfo } from '../shared/Screen';
+import { RESPONSE_ALL_SCREENS, ScreensResponse, SCREEN_UPDATED } from '../shared/ws-server-messages';
 
 export default function useAdminWs(token?: string | null): {
    socket: Socket | null;
    connected: boolean;
    connectionError: boolean;
 } {
-   const dispatch = useDispatch();
+   const queryClient = useQueryClient();
    const [socket, setSocket] = useState<Socket | null>(null);
    const [connected, setConnected] = useState(false);
    const [connectionError, setConnectionError] = useState<boolean>(false);
@@ -31,11 +22,17 @@ export default function useAdminWs(token?: string | null): {
       const sock = io({ auth: { token } });
 
       const allScreensHandler = (data: ScreensResponse) => {
-         dispatch(setScreens(data.screens));
+         queryClient.setQueryData(['all_screens'], data);
       };
 
       const updateScreenHandler = (data: ScreenInfo) => {
-         dispatch(setScreen(data));
+         queryClient.setQueryData<ScreensResponse>(['all_screens'], (previous) => {
+            if (!previous) {
+               return { screens: [data] };
+            }
+
+            return { screens: previous.screens.map((x) => (x.name !== data.name ? x : data)) };
+         });
       };
 
       const connectedHandler = () => {
@@ -70,23 +67,7 @@ export default function useAdminWs(token?: string | null): {
          sock.io.off('close', disconnectedHandler);
          sock.io.off('close', connectionErrorHandler);
       };
-   }, [token, dispatch]);
+   }, [token, queryClient]);
 
    return { socket, connected, connectionError };
-}
-
-export function sendRequestScreens(socket: Socket) {
-   socket.emit(REQUEST_ALL_SCREENS);
-}
-
-export function sendPutScreen(socket: Socket, screen: ScreenDto) {
-   socket.emit(REQUEST_PUT_SCREEN, screen);
-}
-
-export function sendDelScreen(socket: Socket, name: string) {
-   socket.emit(REQUEST_DEL_SCREEN, name);
-}
-
-export function sendPutScreenContent(socket: Socket, dto: PutScreenContentRequest) {
-   socket.emit(REQUEST_PUT_SCREEN_CONTENT, dto);
 }
