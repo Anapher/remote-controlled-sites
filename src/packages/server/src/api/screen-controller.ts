@@ -23,7 +23,7 @@ export default function configureApi(app: Express, io: Server) {
       io.to(ADMIN_ROOM_NAME).emit(RESPONSE_ALL_SCREENS, response);
    };
 
-   app.get('/api/screen/:name', authenticateToken, async (req, resp) => {
+   app.get('/api/screen/:name', async (req, resp) => {
       const name = req.params.name;
       try {
          ScreenSchema.parse({ name });

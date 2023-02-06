@@ -2,8 +2,8 @@ import axios from 'axios';
 import { ScreenContent, ScreenDto, ScreenInfo } from '../shared/Screen';
 import { ScreensResponse } from '../shared/ws-server-messages';
 
-export async function fetchScreen({ token, screenName }: { token: string; screenName: string }): Promise<ScreenInfo> {
-   const result = await axios.get(`/api/screen/${screenName}`, { headers: { Authorization: 'Bearer ' + token } });
+export async function fetchScreen({ screenName }: { screenName: string }): Promise<ScreenInfo> {
+   const result = await axios.get(`/api/screen/${screenName}`);
    return result.data;
 }
 

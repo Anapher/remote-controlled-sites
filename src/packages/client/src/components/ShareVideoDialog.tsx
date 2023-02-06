@@ -3,14 +3,11 @@ import { Button, Dialog, DialogContent, DialogTitle, TextField } from '@mui/mate
 import { Stack } from '@mui/system';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
-import { Socket } from 'socket.io-client';
 import { z } from 'zod';
-import { RootState } from '../../../app/store';
-import { setScreenContent } from '../../../services/screen';
-import { ScreenControlledVideo, ScreenInfo } from '../../../shared/Screen';
-import { wrapForInputRef } from '../../../utils/react-hook-form-utils';
-import ShareVideoActionsPlayer from './ShareVideoActionsPlayer';
+import { setScreenContent } from '../services/screen';
+import { ScreenControlledVideo, ScreenInfo } from '../shared/Screen';
+import { wrapForInputRef } from '../utils/react-hook-form-utils';
+import ShareVideoActionsPlayer from '../features/admin/components/ShareVideoActionsPlayer';
 
 const ShareVideoSchema = z.object({ url: z.string().min(1) });
 
@@ -19,18 +16,16 @@ type ShareVideoForm = z.infer<typeof ShareVideoSchema>;
 type Props = {
    open: boolean;
    onClose: () => void;
-   socket: Socket;
    screenInfo?: ScreenInfo;
+   token: string;
 };
 
-export default function ShareVideoDialog({ open, onClose, socket, screenInfo }: Props) {
+export default function ShareVideoDialog({ open, onClose, screenInfo, token }: Props) {
    const {
       handleSubmit,
       register,
       formState: { isValid },
    } = useForm<ShareVideoForm>({ resolver: zodResolver(ShareVideoSchema), mode: 'onChange' });
-
-   const token = useSelector((state: RootState) => state.admin.authToken);
 
    const mutation = useMutation({
       mutationFn: setScreenContent,

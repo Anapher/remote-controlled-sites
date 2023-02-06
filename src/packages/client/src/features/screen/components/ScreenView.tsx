@@ -1,7 +1,4 @@
-import useAuthSocket from '../../../hooks/useAuthSocket';
-import useAuthToken from '../../../hooks/useAuthToken';
-import { authAsUser } from '../../../services/auth';
-import ConnectingView from './ConnectingView';
+import ScreenContentView from '../../../components/ScreenContentView';
 import ScreenConnectedView from './ScreenConnectedView';
 
 type Props = {
@@ -9,10 +6,5 @@ type Props = {
 };
 
 export default function ScreenView({ id }: Props) {
-   const token = useAuthToken(authAsUser);
-   const socket = useAuthSocket(token);
-
-   if (!socket || !token) return <ConnectingView />;
-
-   return <ScreenConnectedView id={id} token={token} socket={socket} />;
+   return <ScreenContentView id={id} render={(props) => <ScreenConnectedView {...props} />} />;
 }

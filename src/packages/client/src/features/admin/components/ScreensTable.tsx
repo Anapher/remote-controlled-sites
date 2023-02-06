@@ -1,3 +1,6 @@
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import LinkIcon from '@mui/icons-material/Link';
 import {
    Button,
    ButtonGroup,
@@ -9,22 +12,15 @@ import {
    Tooltip,
    Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Socket } from 'socket.io-client';
-import TokenRestClient from '../../../services/token-rest-client';
-import connectWebRtc from '../../../app/webrtc/web-rtc-connect';
-import { ScreenContent, ScreenDto } from '../../../shared/Screen';
-import { WebRtcConnection } from '../../../app/webrtc/WebRtcConnection';
-import { Producer } from 'mediasoup-client/lib/Producer';
-import { REQUEST_LEAVE_ROOM } from '../../../shared/ws-server-messages';
 import { RootState } from '../../../app/store';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import LinkIcon from '@mui/icons-material/Link';
-import ShareVideoDialog from './ShareVideoDialog';
-import { useQuery } from '@tanstack/react-query';
+import ShareVideoDialog from '../../../components/ShareVideoDialog';
+import useScreenShare from '../../../hooks/useScreenShare';
 import { fetchAllScreens } from '../../../services/screen';
+import { ScreenContent, ScreenDto } from '../../../shared/Screen';
 
 function renderContent(content: ScreenContent | null) {
    if (!content)
@@ -43,13 +39,6 @@ function renderContent(content: ScreenContent | null) {
    }
 }
 
-type CurrentScreenShareState = {
-   name: string;
-   connection: WebRtcConnection;
-   producer: Producer;
-   track: MediaStreamTrack;
-};
-
 type Props = {
    onDelete: (screen: ScreenDto) => void;
    onEdit: (screen: ScreenDto) => void;
@@ -63,18 +52,8 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    const [shareVideoScreenName, setShareVideoScreenName] = useState('');
 
    const token = useSelector((state: RootState) => state.admin.authToken)!;
-   const [currentScreenShare, setCurrentScreenShare] = useState<CurrentScreenShareState | null>(null);
 
-   useEffect(() => {
-      if (!currentScreenShare) return;
-
-      return () => {
-         currentScreenShare.connection.close();
-         currentScreenShare.track.stop();
-
-         socket.emit(REQUEST_LEAVE_ROOM);
-      };
-   }, [currentScreenShare, socket]);
+   const { currentScreenShare, onShareScreen, onStopShareScreen } = useScreenShare(socket, token);
 
    const handleDeleteWithConfirm = (screen: ScreenDto) => {
       if (
@@ -89,50 +68,6 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
       navigator.clipboard.writeText(window.location.origin + '/screens/' + screen.name);
    };
 
-   const handleShareScreen = async (screen: ScreenDto) => {
-      const constraints: MediaStreamConstraints = { video: { height: { ideal: 1080 }, frameRate: 25 }, audio: true };
-      const stream = (await (navigator.mediaDevices as any).getDisplayMedia(constraints)) as MediaStream;
-
-      const track = stream.getVideoTracks()[0];
-
-      console.log('connect web rtc');
-
-      const client = new TokenRestClient(token);
-      const connection = await connectWebRtc(screen.name, client, socket);
-
-      console.log('webrtc connection created');
-
-      const transport = await connection.createSendTransport();
-      const producer = await transport.produce({
-         track,
-         appData: { source: 'screen' },
-      });
-
-      producer.on('transportclose', () => {
-         setCurrentScreenShare(null);
-      });
-
-      producer.on('trackended', () => {
-         setCurrentScreenShare(null);
-      });
-
-      const audioTracks = stream.getAudioTracks();
-      if (audioTracks.length > 0) {
-         const audioTrack = audioTracks[0];
-
-         await transport.produce({
-            track: audioTrack,
-            appData: { source: 'sys-audio' },
-         });
-      }
-
-      setCurrentScreenShare({ track, producer, connection, name: screen.name });
-   };
-
-   const handleStopSharingScreen = () => {
-      setCurrentScreenShare(null);
-   };
-
    const handleOpenShareVideo = (name: string) => {
       setShareVideoScreenName(name);
       setShareVideoOpen(true);
@@ -144,7 +79,7 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
          <ShareVideoDialog
             open={shareVideoOpen}
             onClose={handleCloseShareVideo}
-            socket={socket}
+            token={token}
             screenInfo={data?.screens.find((x) => x.name === shareVideoScreenName)}
          />
          <TableHead>
@@ -162,11 +97,11 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
                   <TableCell>
                      <ButtonGroup size="small">
                         {currentScreenShare?.name === x.name ? (
-                           <Button onClick={handleStopSharingScreen} color="secondary">
+                           <Button onClick={onStopShareScreen} color="secondary">
                               Bildschirm nicht mehr teilen
                            </Button>
                         ) : (
-                           <Button onClick={() => handleShareScreen(x)} disabled={x.content?.type === 'screenshare'}>
+                           <Button onClick={() => onShareScreen(x)} disabled={x.content?.type === 'screenshare'}>
                               Bildschirm teilen
                            </Button>
                         )}

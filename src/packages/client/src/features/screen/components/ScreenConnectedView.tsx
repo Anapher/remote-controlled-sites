@@ -1,35 +1,24 @@
-import { useQuery } from '@tanstack/react-query';
 import { Socket } from 'socket.io-client';
-import useQueryClientUpdateScreen from '../../../hooks/useScreenInfo';
-import { fetchScreen } from '../../../services/screen';
-import ConnectingView from './ConnectingView';
+import { ScreenInfo } from '../../../shared/Screen';
 import NoContent from './NoContent';
 import ScreenControlledVideoContent from './ScreenControlledVideoContent';
 import ScreenShareScreenContent from './ScreenShareScreenContent';
 import UrlScreenContent from './UrlScreenContent';
 
 type Props = {
-   id: string;
    socket: Socket;
    token: string;
+   screen: ScreenInfo;
 };
 
-export default function ScreenConnectedView({ id, token, socket }: Props) {
-   const { data: screen, isFetching } = useQuery({
-      queryKey: ['screen', id],
-      queryFn: () => fetchScreen({ token, screenName: id }),
-   });
-
-   useQueryClientUpdateScreen(id, socket);
-
-   if (!screen || isFetching) return <ConnectingView />;
+export default function ScreenConnectedView({ screen, token, socket }: Props) {
    if (!screen.content) return <NoContent />;
 
    switch (screen.content.type) {
       case 'url':
          return <UrlScreenContent content={screen.content} />;
       case 'screenshare':
-         return <ScreenShareScreenContent screenName={id} socket={socket} token={token} />;
+         return <ScreenShareScreenContent screenName={screen.name} socket={socket} token={token} />;
       case 'controlled-video':
          return <ScreenControlledVideoContent content={screen.content} />;
       default:
