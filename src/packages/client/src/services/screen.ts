@@ -21,9 +21,13 @@ export async function setScreenContent({
    screenName: string;
    content: ScreenContent;
 }): Promise<ScreenInfo> {
-   const result = await axios.post(`/api/screen/${screenName}/content`, content, {
-      headers: { Authorization: 'Bearer ' + token },
-   });
+   const result = await axios.post(
+      `/api/screen/${screenName}/content`,
+      { content },
+      {
+         headers: { Authorization: 'Bearer ' + token },
+      },
+   );
    return result.data;
 }
 

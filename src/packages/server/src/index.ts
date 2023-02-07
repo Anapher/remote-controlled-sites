@@ -30,7 +30,7 @@ async function main() {
       if (sharing) {
          setScreenContent(name, { type: 'screenshare' });
       } else {
-         setScreenContent(name, undefined);
+         setScreenContent(name, null);
       }
 
       io.emit(SCREEN_UPDATED, await getScreenInfo(name));

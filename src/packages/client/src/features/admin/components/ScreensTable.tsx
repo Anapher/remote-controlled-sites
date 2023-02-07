@@ -4,6 +4,8 @@ import LinkIcon from '@mui/icons-material/Link';
 import {
    Button,
    ButtonGroup,
+   Divider,
+   MenuItem,
    Table,
    TableBody,
    TableCell,
@@ -12,15 +14,27 @@ import {
    Tooltip,
    Typography,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Socket } from 'socket.io-client';
 import { RootState } from '../../../app/store';
 import ShareVideoDialog from '../../../components/ShareVideoDialog';
 import useScreenShare from '../../../hooks/useScreenShare';
-import { fetchAllScreens } from '../../../services/screen';
-import { ScreenContent, ScreenDto } from '../../../shared/Screen';
+import { fetchAllScreens, setScreenContent } from '../../../services/screen';
+import { ScreenContent, ScreenDto, ScreenInfo } from '../../../shared/Screen';
+import ScreensContentActionPopper from './ScreensContentActionPopper';
+
+// workaround for issue with Popper: https://github.com/mui/material-ui/issues/35287#issuecomment-1337250566, until we are using @types/react@18
+declare global {
+   namespace React {
+      interface DOMAttributes<T> {
+         onResize?: ReactEventHandler<T> | undefined;
+         onResizeCapture?: ReactEventHandler<T> | undefined;
+         nonce?: string | undefined;
+      }
+   }
+}
 
 function renderContent(content: ScreenContent | null) {
    if (!content)
@@ -37,6 +51,14 @@ function renderContent(content: ScreenContent | null) {
    if (content.type === 'screenshare') {
       return <Typography fontSize="inherit">Bildschirm wird geteilt</Typography>;
    }
+
+   if (content.type === 'controlled-video') {
+      return (
+         <Typography fontSize="inherit" textOverflow="ellipsis" overflow="hidden" whiteSpace="nowrap">
+            Video {content.url}
+         </Typography>
+      );
+   }
 }
 
 type Props = {
@@ -47,6 +69,10 @@ type Props = {
 
 export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    const { data } = useQuery({ queryKey: ['all_screens'], queryFn: fetchAllScreens });
+
+   const [contentPopperOpen, setContentPopperOpen] = useState(false);
+   const contentPopperAnchorRef = useRef<HTMLElement>();
+   const [currentContentPopperItem, setCurrentContentPopperItem] = useState<string>();
 
    const [shareVideoOpen, setShareVideoOpen] = useState(false);
    const [shareVideoScreenName, setShareVideoScreenName] = useState('');
@@ -74,6 +100,25 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    };
    const handleCloseShareVideo = () => setShareVideoOpen(false);
 
+   const handleOpenContentPopper = (ev: React.MouseEvent<HTMLButtonElement>, screen: ScreenInfo) => {
+      contentPopperAnchorRef.current = ev.target as HTMLElement;
+      setCurrentContentPopperItem(screen.name);
+
+      if (screen.name === currentContentPopperItem && contentPopperOpen) {
+         setContentPopperOpen(false);
+      } else {
+         setContentPopperOpen(true);
+      }
+   };
+
+   const mutation = useMutation({
+      mutationFn: setScreenContent,
+   });
+
+   const handleDeleteScreenContent = (screenName: string) => {
+      mutation.mutate({ token, screenName, content: null });
+   };
+
    return (
       <Table>
          <ShareVideoDialog
@@ -89,6 +134,30 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
                <TableCell>Aktionen</TableCell>
             </TableRow>
          </TableHead>
+
+         <ScreensContentActionPopper
+            open={contentPopperOpen}
+            anchor={contentPopperAnchorRef}
+            onClose={() => setContentPopperOpen(false)}
+            screen={data?.screens.find((x) => x.name === currentContentPopperItem)}
+            renderMenuItems={(screen) => (
+               <>
+                  <MenuItem onClick={() => handleOpenShareVideo(screen.name)}>Video teilen</MenuItem>
+                  {currentScreenShare?.name === screen.name ? (
+                     <MenuItem onClick={onStopShareScreen} color="secondary">
+                        Bildschirm nicht mehr teilen
+                     </MenuItem>
+                  ) : (
+                     <MenuItem onClick={() => onShareScreen(screen)} disabled={screen.content?.type === 'screenshare'}>
+                        Bildschirm teilen
+                     </MenuItem>
+                  )}
+                  <Divider />
+                  <MenuItem onClick={() => handleDeleteScreenContent(screen.name)}>Entfernen</MenuItem>
+               </>
+            )}
+         />
+
          <TableBody>
             {data?.screens.map((x) => (
                <TableRow key={x.name}>
@@ -96,16 +165,10 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
                   <TableCell>{renderContent(x.content)}</TableCell>
                   <TableCell>
                      <ButtonGroup size="small">
-                        {currentScreenShare?.name === x.name ? (
-                           <Button onClick={onStopShareScreen} color="secondary">
-                              Bildschirm nicht mehr teilen
-                           </Button>
-                        ) : (
-                           <Button onClick={() => onShareScreen(x)} disabled={x.content?.type === 'screenshare'}>
-                              Bildschirm teilen
-                           </Button>
-                        )}
-                        <Button onClick={() => handleOpenShareVideo(x.name)}>Video teilen</Button>
+                        <Button onClick={(ev) => handleOpenContentPopper(ev, x)} color="primary">
+                           Content setzen
+                        </Button>
+
                         <Tooltip title="Url kopieren">
                            <Button onClick={() => handleCopyUrl(x)} aria-label="url kopieren">
                               <LinkIcon />

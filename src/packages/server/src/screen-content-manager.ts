@@ -3,7 +3,7 @@ import { ScreenContent, ScreenDto, ScreenInfo } from './shared/Screen';
 
 const screenContent = new Map<string, ScreenContent>();
 
-export function setScreenContent(name: string, content?: ScreenContent) {
+export function setScreenContent(name: string, content: ScreenContent) {
    if (content) screenContent.set(name, content);
    else screenContent.delete(name);
 }

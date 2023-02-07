@@ -27,11 +27,9 @@ export const ScreenShareContentSchema = z.object({
    type: z.literal('screenshare'),
 });
 
-export const ScreenContentSchema = z.discriminatedUnion('type', [
-   ScreenControlledVideoSchema,
-   ScreenWebsiteContentSchema,
-   ScreenShareContentSchema,
-]);
+export const ScreenContentSchema = z
+   .discriminatedUnion('type', [ScreenControlledVideoSchema, ScreenWebsiteContentSchema, ScreenShareContentSchema])
+   .nullable();
 
 export type ScreenDto = z.infer<typeof ScreenSchema>;
 

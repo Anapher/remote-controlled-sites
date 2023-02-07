@@ -91,10 +91,10 @@ export default function configureApi(app: Express, io: Server) {
 
       let result: ScreenContent;
       try {
-         result = ScreenContentSchema.parse(req.body);
+         result = ScreenContentSchema.parse(req.body.content);
       } catch (error) {
          console.error('[change screen content] Validation failed', error);
-         resp.sendStatus(401);
+         resp.sendStatus(400);
          return;
       }
 
