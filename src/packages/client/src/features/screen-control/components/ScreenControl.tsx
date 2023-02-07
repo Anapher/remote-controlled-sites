@@ -30,7 +30,7 @@ export default function ScreenControl({ token, screen, socket }: Props) {
             screenInfo={screen}
             token={token}
             open={videoShareOpen}
-            onClose={() => setVideoShareOpen(true)}
+            onClose={() => setVideoShareOpen(false)}
          />
          <Stack direction="column" spacing={2}>
             <Fab color="primary" variant="extended" onClick={handleToggleScreenShare}>
