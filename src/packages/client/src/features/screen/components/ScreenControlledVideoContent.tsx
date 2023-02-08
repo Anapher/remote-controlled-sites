@@ -1,40 +1,54 @@
-import { useEffect, useRef } from 'react';
-import ReactPlayer from 'react-player';
-import { OnProgressProps } from 'react-player/base';
-import Player from '../../../components/TypedVideoPlayer';
-import { TOLERATED_POSITION_DIFF } from '../../../config';
+import { Fab } from '@mui/material';
+import { Box, Stack } from '@mui/system';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import ReadonlySyncVideo from '../../../components/ReadonlySyncVideo';
+import SyncVideo from '../../../components/SyncVideo';
+import { setScreenContent } from '../../../services/screen';
 import { ScreenControlledVideo } from '../../../shared/Screen';
 
 type Props = {
    content: ScreenControlledVideo;
+   screenName: string;
+   token: string;
 };
 
-export default function ScreenControlledVideoContent({ content }: Props) {
-   const player = useRef<ReactPlayer>(null);
+export default function ScreenControlledVideoContent({ content, screenName, token }: Props) {
+   const mutation = useMutation({
+      mutationFn: setScreenContent,
+   });
 
-   const handleOnProgress = (args: OnProgressProps) => {
-      if (content.paused) return;
+   const [useControl, setUseControl] = useState(false);
 
-      const startPosition = Math.round(new Date().getTime() - args.playedSeconds * 1000);
-
-      if (Math.abs(content.startPosition - startPosition) > TOLERATED_POSITION_DIFF) {
-         player.current?.seekTo((new Date().getTime() - content.startPosition) / 1000, 'seconds');
-      }
+   const handleGoBack = () => {
+      mutation.mutate({ content: null, token, screenName });
    };
 
-   useEffect(() => {
-      player.current?.seekTo((new Date().getTime() - content.startPosition) / 1000, 'seconds');
-   }, [content.startPosition]);
+   const handleOnChange = (content: ScreenControlledVideo) => {
+      mutation.mutate({ content, token, screenName });
+   };
+
+   const handleToggleControl = () => {
+      setUseControl((prev) => !prev);
+   };
 
    return (
-      <Player
-         url={content.url}
-         height="100%"
-         width="100%"
-         playing={!content.paused}
-         onProgress={handleOnProgress}
-         muted
-         ref={player}
-      />
+      <Box width="100%" height="100%" display="flex" flexDirection="column">
+         <Stack spacing={2} p={1} direction="row">
+            <Fab variant="extended" onClick={handleGoBack}>
+               Zurück
+            </Fab>
+            <Fab variant="extended" onClick={handleToggleControl} color={useControl ? 'secondary' : undefined}>
+               {!useControl ? 'Video kontrollieren' : 'Video nicht mehr kontrollieren'}
+            </Fab>
+         </Stack>
+         <Box flex={1}>
+            {useControl ? (
+               <SyncVideo current={content} onChange={handleOnChange} fullscreen />
+            ) : (
+               <ReadonlySyncVideo content={content} />
+            )}
+         </Box>
+      </Box>
    );
 }

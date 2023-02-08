@@ -53,7 +53,7 @@ export default function AuthorizedIndex({ socket }: Props) {
 
    return (
       <Container maxWidth="md">
-         <Typography variant="h4" textAlign="center" gutterBottom>
+         <Typography variant="h4" textAlign="center" gutterBottom sx={{ mt: 6 }}>
             Bildschirme
          </Typography>
 
