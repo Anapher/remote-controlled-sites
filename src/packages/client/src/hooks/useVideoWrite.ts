@@ -1,16 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { ReactPlayerProps } from 'react-player';
 import { OnProgressProps } from 'react-player/base';
 import { TOLERATED_POSITION_DIFF } from '../config';
 import { ScreenControlledVideo } from '../shared/Screen';
-import Player from './TypedVideoPlayer';
 
-type Props = {
-   current: ScreenControlledVideo;
-   onChange: (dto: ScreenControlledVideo) => void;
-   fullscreen?: boolean;
-};
-
-export default function SyncVideo({ current, onChange, fullscreen }: Props) {
+export default function useVideoWrite(
+   current: ScreenControlledVideo,
+   onChange: (dto: ScreenControlledVideo) => void,
+): Partial<ReactPlayerProps> {
    const latestStatus = useRef(current);
 
    useEffect(() => {
@@ -40,15 +37,10 @@ export default function SyncVideo({ current, onChange, fullscreen }: Props) {
       }
    };
 
-   return (
-      <Player
-         width={fullscreen ? '100%' : undefined}
-         height={fullscreen ? '100%' : undefined}
-         url={current.url}
-         controls
-         onPlay={handleOnPlay}
-         onPause={handleOnPause}
-         onProgress={handleOnProgress}
-      />
-   );
+   return {
+      url: current.url,
+      onPlay: handleOnPlay,
+      onPause: handleOnPause,
+      onProgress: handleOnProgress,
+   };
 }

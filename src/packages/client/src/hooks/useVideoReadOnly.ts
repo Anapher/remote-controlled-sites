@@ -1,15 +1,10 @@
 import { useEffect, useRef } from 'react';
-import ReactPlayer from 'react-player';
+import ReactPlayer, { ReactPlayerProps } from 'react-player';
 import { OnProgressProps } from 'react-player/base';
 import { TOLERATED_POSITION_DIFF } from '../config';
 import { ScreenControlledVideo } from '../shared/Screen';
-import Player from './TypedVideoPlayer';
 
-type Props = {
-   content: ScreenControlledVideo;
-};
-
-export default function ReadonlySyncVideo({ content }: Props) {
+export default function useVideoReadOnly(content: ScreenControlledVideo): Partial<ReactPlayerProps> {
    const player = useRef<ReactPlayer>(null);
 
    const handleOnProgress = (args: OnProgressProps) => {
@@ -26,15 +21,10 @@ export default function ReadonlySyncVideo({ content }: Props) {
       player.current?.seekTo((new Date().getTime() - content.startPosition) / 1000, 'seconds');
    }, [content.startPosition]);
 
-   return (
-      <Player
-         url={content.url}
-         height="100%"
-         width="100%"
-         playing={!content.paused}
-         onProgress={handleOnProgress}
-         muted
-         ref={player}
-      />
-   );
+   return {
+      url: content.url,
+      playing: !content.paused,
+      onProgress: handleOnProgress,
+      ref: player,
+   };
 }

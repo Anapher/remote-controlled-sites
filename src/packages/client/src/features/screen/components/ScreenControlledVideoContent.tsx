@@ -2,10 +2,11 @@ import { Fab } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import ReadonlySyncVideo from '../../../components/ReadonlySyncVideo';
-import SyncVideo from '../../../components/SyncVideo';
 import { setScreenContent } from '../../../services/screen';
 import { ScreenControlledVideo } from '../../../shared/Screen';
+import Player from '../../../components/TypedVideoPlayer';
+import useVideoReadOnly from '../../../hooks/useVideoReadOnly';
+import useVideoWrite from '../../../hooks/useVideoWrite';
 
 type Props = {
    content: ScreenControlledVideo;
@@ -32,6 +33,9 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
       setUseControl((prev) => !prev);
    };
 
+   const readOnlyProps = useVideoReadOnly(content);
+   const writeProps = useVideoWrite(content, handleOnChange);
+
    return (
       <Box width="100%" height="100%" display="flex" flexDirection="column">
          <Stack spacing={2} p={1} direction="row">
@@ -43,11 +47,7 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
             </Fab>
          </Stack>
          <Box flex={1}>
-            {useControl ? (
-               <SyncVideo current={content} onChange={handleOnChange} fullscreen />
-            ) : (
-               <ReadonlySyncVideo content={content} />
-            )}
+            <Player width={'100%'} height={'100%'} {...(useControl ? writeProps : readOnlyProps)} controls={true} />
          </Box>
       </Box>
    );
