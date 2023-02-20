@@ -24,6 +24,7 @@ import useScreenShare from '../../../hooks/useScreenShare';
 import { fetchAllScreens, setScreenContent } from '../../../services/screen';
 import { ScreenContent, ScreenDto, ScreenInfo } from '../../../shared/Screen';
 import ScreensContentActionPopper from './ScreensContentActionPopper';
+import AddLinkIcon from '@mui/icons-material/AddLink';
 
 // workaround for issue with Popper: https://github.com/mui/material-ui/issues/35287#issuecomment-1337250566, until we are using @types/react@18
 declare global {
@@ -92,6 +93,10 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
 
    const handleCopyUrl = (screen: ScreenDto) => {
       navigator.clipboard.writeText(window.location.origin + '/screens/' + screen.name);
+   };
+
+   const handleCopyControlUrl = (screen: ScreenDto) => {
+      navigator.clipboard.writeText(window.location.origin + '/screens/' + screen.name + '/control');
    };
 
    const handleOpenShareVideo = (name: string) => {
@@ -172,6 +177,11 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
                         <Tooltip title="Url kopieren">
                            <Button onClick={() => handleCopyUrl(x)} aria-label="url kopieren">
                               <LinkIcon />
+                           </Button>
+                        </Tooltip>
+                        <Tooltip title="Control-Url kopieren">
+                           <Button onClick={() => handleCopyControlUrl(x)} aria-label="url kopieren">
+                              <AddLinkIcon />
                            </Button>
                         </Tooltip>
                         <Tooltip title="Bearbeiten">

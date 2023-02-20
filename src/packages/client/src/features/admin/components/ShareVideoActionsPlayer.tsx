@@ -8,6 +8,6 @@ type Props = {
 };
 
 export default function ShareVideoActionsPlayer({ current, onChange }: Props) {
-   const props = useVideoWrite(current, onChange);
+   const [props] = useVideoWrite(current, onChange, false);
    return <Player {...props} controls={true} />;
 }

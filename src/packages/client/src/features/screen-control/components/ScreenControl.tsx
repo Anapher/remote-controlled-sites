@@ -1,4 +1,4 @@
-import { Fab } from '@mui/material';
+import { Fab, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import { useState } from 'react';
 import { Socket } from 'socket.io-client';
@@ -32,14 +32,19 @@ export default function ScreenControl({ token, screen, socket }: Props) {
             open={videoShareOpen}
             onClose={() => setVideoShareOpen(false)}
          />
-         <Stack direction="column" spacing={2}>
-            <Fab color="primary" variant="extended" onClick={handleToggleScreenShare}>
-               {currentScreenShare ? 'Bildschirm teilen beenden' : 'Bildschirm teilen'}
-            </Fab>
-            <Fab color="primary" variant="extended" onClick={() => setVideoShareOpen(true)}>
-               Video abspielen
-            </Fab>
-         </Stack>
+         <Box>
+            <Typography variant="h3" gutterBottom align="center" sx={{ mb: 4 }}>
+               Inhalte für Screen <b>{screen.name}</b>
+            </Typography>
+            <Stack direction="row" spacing={2}>
+               <Fab color="primary" variant="extended" onClick={handleToggleScreenShare} sx={{ width: 300 }}>
+                  {currentScreenShare ? 'Bildschirm teilen beenden' : 'Bildschirm teilen'}
+               </Fab>
+               <Fab color="primary" variant="extended" onClick={() => setVideoShareOpen(true)} sx={{ width: 300 }}>
+                  Video abspielen
+               </Fab>
+            </Stack>
+         </Box>
       </Box>
    );
 }
