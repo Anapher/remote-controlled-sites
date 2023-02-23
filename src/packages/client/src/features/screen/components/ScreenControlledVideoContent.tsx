@@ -1,15 +1,15 @@
-import { Fab, Typography } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Fab } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import Player from '../../../components/TypedVideoPlayer';
+import useManagedVideo from '../../../hooks/useManagedVideo';
 import { setScreenContent } from '../../../services/screen';
 import { ScreenControlledVideo } from '../../../shared/Screen';
-import Player from '../../../components/TypedVideoPlayer';
-import useVideoWrite from '../../../hooks/useVideoWrite';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useSelector } from 'react-redux';
-import { selectHadUserInteraction } from '../../user-interaction/selectors';
 import RequestUserInteractionView from '../../user-interaction/components/RequestUserInteractionView';
+import { selectHadUserInteraction } from '../../user-interaction/selectors';
 
 type Props = {
    content: ScreenControlledVideo;
@@ -36,10 +36,7 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
       setUseControl((prev) => !prev);
    };
 
-   const [writeProps, isOutOfSync] = useVideoWrite(content, handleOnChange, !useControl);
-
    const hadInteraction = useSelector(selectHadUserInteraction);
-
    if (!hadInteraction) return <RequestUserInteractionView />;
 
    return (
@@ -52,15 +49,21 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
             <Fab variant="extended" onClick={handleToggleControl} color={useControl ? 'secondary' : undefined}>
                {!useControl ? 'Video kontrollieren' : 'Video nicht mehr kontrollieren'}
             </Fab>
-            {isOutOfSync && (
-               <Typography sx={{ flex: 1 }} align="right">
-                  Desync
-               </Typography>
-            )}
          </Stack>
          <Box flex={1}>
-            <Player width={'100%'} height={'100%'} {...writeProps} controls={useControl} key={`${useControl}`} />
+            <ControlledVideo control={useControl} onChange={handleOnChange} content={content} key={`${useControl}`} />
          </Box>
       </Box>
    );
 }
+
+type ControlledVideoProps = {
+   control: boolean;
+   content: ScreenControlledVideo;
+   onChange: (content: ScreenControlledVideo) => void;
+};
+
+const ControlledVideo = ({ control, content, onChange }: ControlledVideoProps) => {
+   const props = useManagedVideo(content, onChange, control);
+   return <Player width={'100%'} height={'100%'} {...props} controls={control} />;
+};

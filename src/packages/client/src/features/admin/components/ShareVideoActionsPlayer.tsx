@@ -1,6 +1,6 @@
-import useVideoWrite from '../../../hooks/useVideoWrite';
 import { ScreenControlledVideo } from '../../../shared/Screen';
 import Player from '../../../components/TypedVideoPlayer';
+import useManagedVideo from '../../../hooks/useManagedVideo';
 
 type Props = {
    current: ScreenControlledVideo;
@@ -8,6 +8,6 @@ type Props = {
 };
 
 export default function ShareVideoActionsPlayer({ current, onChange }: Props) {
-   const [props] = useVideoWrite(current, onChange, false);
+   const props = useManagedVideo(current, onChange, false);
    return <Player {...props} controls={true} />;
 }
