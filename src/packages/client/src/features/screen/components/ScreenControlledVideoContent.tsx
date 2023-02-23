@@ -59,7 +59,7 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
             )}
          </Stack>
          <Box flex={1}>
-            <Player width={'100%'} height={'100%'} {...writeProps} controls={true} />
+            <Player width={'100%'} height={'100%'} {...writeProps} controls={useControl} key={`${useControl}`} />
          </Box>
       </Box>
    );
