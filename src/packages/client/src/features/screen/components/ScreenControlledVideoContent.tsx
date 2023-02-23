@@ -7,6 +7,9 @@ import { ScreenControlledVideo } from '../../../shared/Screen';
 import Player from '../../../components/TypedVideoPlayer';
 import useVideoWrite from '../../../hooks/useVideoWrite';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useSelector } from 'react-redux';
+import { selectHadUserInteraction } from '../../user-interaction/selectors';
+import RequestUserInteractionView from '../../user-interaction/components/RequestUserInteractionView';
 
 type Props = {
    content: ScreenControlledVideo;
@@ -34,6 +37,10 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
    };
 
    const [writeProps, isOutOfSync] = useVideoWrite(content, handleOnChange, !useControl);
+
+   const hadInteraction = useSelector(selectHadUserInteraction);
+
+   if (!hadInteraction) return <RequestUserInteractionView />;
 
    return (
       <Box width="100%" height="100%" display="flex" flexDirection="column">

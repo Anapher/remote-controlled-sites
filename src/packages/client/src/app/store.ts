@@ -1,10 +1,12 @@
-import { configureStore } from "@reduxjs/toolkit";
-import adminReducer from "../features/admin/slice";
+import { configureStore } from '@reduxjs/toolkit';
+import adminReducer from '../features/admin/slice';
+import userInteractionReducer from '../features/user-interaction//slice';
 
 export const store = configureStore({
-  reducer: {
-    admin: adminReducer,
-  },
+   reducer: {
+      admin: adminReducer,
+      userInteraction: userInteractionReducer,
+   },
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

@@ -6,6 +6,7 @@ import { store } from './app/store';
 import { Provider } from 'react-redux';
 import debug from 'debug';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import UserInteractionListener from './features/user-interaction/components/UserInteractionListener';
 
 const queryClient = new QueryClient();
 
@@ -15,6 +16,7 @@ ReactDOM.render(
    <React.StrictMode>
       <QueryClientProvider client={queryClient}>
          <Provider store={store}>
+            <UserInteractionListener />
             <App />
          </Provider>
       </QueryClientProvider>
