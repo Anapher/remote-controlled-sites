@@ -10,6 +10,7 @@ import SocketIoClientMessenger from './websockets/socketio-client-messenger';
 import { getScreenInfo, setScreenContent } from './screen-content-manager';
 import { SCREEN_UPDATED } from './shared/ws-server-messages';
 import path from 'path';
+import cors from 'cors';
 
 main();
 
@@ -20,6 +21,7 @@ async function main() {
    const app = express();
    app.use(express.json());
    app.use(express.static('client'));
+   app.use(cors());
 
    const server = http.createServer(app);
    const io = new Server(server);
