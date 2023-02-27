@@ -60,11 +60,6 @@ export default function useManagedVideo(
    }, [latestStatus]);
 
    useEffect(() => {
-      const token = setInterval(() => {}, 5000);
-      return () => clearInterval(token);
-   }, []);
-
-   useEffect(() => {
       if (initializing) return;
 
       setPlaying(!current.paused);
