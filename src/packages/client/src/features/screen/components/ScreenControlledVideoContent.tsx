@@ -2,7 +2,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Fab } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import Player from '../../../components/TypedVideoPlayer';
 import useManagedVideo from '../../../hooks/useManagedVideo';
@@ -10,6 +9,9 @@ import { setScreenContent } from '../../../services/screen';
 import { ScreenControlledVideo } from '../../../shared/Screen';
 import RequestUserInteractionView from '../../user-interaction/components/RequestUserInteractionView';
 import { selectHadUserInteraction } from '../../user-interaction/selectors';
+import { createId } from '@paralleldrive/cuid2';
+
+const clientId = createId();
 
 type Props = {
    content: ScreenControlledVideo;
@@ -22,7 +24,7 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
       mutationFn: setScreenContent,
    });
 
-   const [useControl, setUseControl] = useState(false);
+   const useControl = content.controlToken === clientId;
 
    const handleGoBack = () => {
       mutation.mutate({ content: null, token, screenName });
@@ -33,7 +35,7 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
    };
 
    const handleToggleControl = () => {
-      setUseControl((prev) => !prev);
+      mutation.mutate({ token, screenName, content: { ...content, controlToken: useControl ? undefined : clientId } });
    };
 
    const hadInteraction = useSelector(selectHadUserInteraction);
