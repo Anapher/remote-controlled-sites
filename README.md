@@ -48,7 +48,7 @@ To create a router, you need a worker, which is basically a wrapper for a medias
 
 ## Change content of a screen programmatically
 
-Send a POST-Request to `/api/screen/test/content` with a content in this scheme:
+Send a POST-Request to `/api/screen/<screen name>/content` with a content in this scheme:
 
 ```json
 {
