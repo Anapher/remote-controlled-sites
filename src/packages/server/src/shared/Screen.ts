@@ -15,7 +15,10 @@ export const ScreenControlledVideoSchema = z.object({
    type: z.literal('controlled-video'),
    url: z.string().url().min(1),
    paused: z.boolean(),
-   startPosition: z.number().int(),
+   startPosition: z
+      .number()
+      .int()
+      .transform((val) => val || new Date().getTime()),
    controlToken: z.string().optional(),
 });
 

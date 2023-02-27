@@ -45,3 +45,33 @@ To create consumers or producers, you need a transport which is suitable, meanin
 To initialize transports, you need a router on the server site. Only transports connected to the same router can consume each other.
 
 To create a router, you need a worker, which is basically a wrapper for a mediasoup process. We take the naive approach to create as many workers as we have cores to balance to load. Routers can also be connected to each other (to balance to load of one room between multiple cores), but that was not implemented here.
+
+## Change content of a screen programmatically
+
+Send a POST-Request to `/api/screen/test/content` with a content in this scheme:
+
+```json
+{
+    "content": {
+        "type": "controlled-video",
+        "url": "https://www.youtube.com/watch?v=1rAseRVXNwY",
+        "paused": true,
+        "startPosition": 1677504492611
+    }
+}
+```
+
+`url` is the normal url to a video. Refer to the documentation of [react-player](https://github.com/cookpete/react-player) for more information about supported video urls and formats. `paused` determines whether the video should be playing right now or not. Start position refers to the milliseconds since epoche (`new Date().getTime()` in JavaScript) when the video was started, so clients can compute the current position. Please note that this must be synchronized to the server. If set to zero, the server will automatically fill in the correct current time.
+
+To just set a new video without anything else, you can send a request like this.
+
+```json
+{
+    "content": {
+        "type": "controlled-video",
+        "url": "<your url>",
+        "paused": true,
+        "startPosition": 0
+    }
+}
+```
