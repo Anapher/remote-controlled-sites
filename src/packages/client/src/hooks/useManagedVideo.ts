@@ -2,6 +2,7 @@ import { RefObject, useEffect, useRef, useState } from 'react';
 import ReactPlayer, { ReactPlayerProps } from 'react-player';
 import { OnProgressProps } from 'react-player/base';
 import { TOLERATED_POSITION_DIFF } from '../config';
+import useSynchronizedTime from '../features/sync-time/useSynchronizedTime';
 import { ScreenControlledVideo } from '../shared/Screen';
 
 // The player must play once in order to be able to seek. Therefore, if the video is currently paused, we still play for one second to seek to the correct position
@@ -30,10 +31,9 @@ export default function useManagedVideo(
 ): Partial<ReactPlayerProps> {
    const playerRef = useRef<ReactPlayer>(null);
    const [playing, setPlaying] = useState(true);
-
    const [initializing, setInitializing] = useState(true);
-
    const [handleChange, latestStatus] = useDesyncChangeState(current, onChange);
+   const { getSyncedTime } = useSynchronizedTime();
 
    const handleChangeSafe = (x: Partial<ScreenControlledVideo>) => {
       if (initializing) return;
@@ -52,7 +52,7 @@ export default function useManagedVideo(
    useEffect(() => {
       const token = setTimeout(() => {
          // independent of control, this is very important!
-         playerRef.current?.seekTo((new Date().getTime() - latestStatus.current!.startPosition) / 1000, 'seconds');
+         playerRef.current?.seekTo((getSyncedTime() - latestStatus.current!.startPosition) / 1000, 'seconds');
          setInitializing(false);
       }, 1000);
 
@@ -64,14 +64,14 @@ export default function useManagedVideo(
 
       setPlaying(!current.paused);
       if (!control) {
-         playerRef.current?.seekTo((new Date().getTime() - current.startPosition) / 1000, 'seconds');
+         playerRef.current?.seekTo((getSyncedTime() - current.startPosition) / 1000, 'seconds');
       }
    }, [current, initializing]);
 
    const handleOnProgress = (args: OnProgressProps) => {
       if (initializing) return;
 
-      const startPosition = Math.round(new Date().getTime() - args.playedSeconds * 1000);
+      const startPosition = Math.round(getSyncedTime() - args.playedSeconds * 1000);
       const isOutOfSync = Math.abs(latestStatus.current!.startPosition - startPosition) > TOLERATED_POSITION_DIFF;
 
       if (isOutOfSync) {
@@ -79,10 +79,7 @@ export default function useManagedVideo(
             handleChangeSafe({ startPosition });
          } else {
             if (!latestStatus.current?.paused) {
-               playerRef.current?.seekTo(
-                  (new Date().getTime() - latestStatus.current!.startPosition) / 1000,
-                  'seconds',
-               );
+               playerRef.current?.seekTo((getSyncedTime() - latestStatus.current!.startPosition) / 1000, 'seconds');
             }
          }
       }

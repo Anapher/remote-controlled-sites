@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import adminReducer from '../features/admin/slice';
-import userInteractionReducer from '../features/user-interaction//slice';
+import userInteractionReducer from '../features/user-interaction/slice';
+import syncTimeReducer from '../features/sync-time/slice';
 
 export const store = configureStore({
    reducer: {
       admin: adminReducer,
       userInteraction: userInteractionReducer,
+      syncTime: syncTimeReducer,
    },
 });
 

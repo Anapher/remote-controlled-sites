@@ -23,8 +23,12 @@ export default function configureApi(app: Express) {
    });
 
    // anyone can normally authenticate and be assigned a user id
-   app.post('/api/auth', (res, resp) => {
+   app.post('/api/auth', (_, resp) => {
       resp.json({ token: generateAccessToken({ id: getUserId() }) });
+   });
+
+   app.get('/api/auth/time', (_, resp) => {
+      resp.json({ time: new Date().getTime() });
    });
 }
 
