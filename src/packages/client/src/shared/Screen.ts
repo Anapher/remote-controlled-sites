@@ -11,11 +11,27 @@ export const ScreenSchema = z.object({
    defaultContent: z.string().url().optional().or(emptyStringToUndefined),
 });
 
+export const ScreenControlledVideoSchemaUrl = z
+   .string()
+   .url()
+   .min(1)
+   .refine((s) => {
+      try {
+         const url = new URL(s);
+         return url.hostname === 'www.youtube.com' || url.hostname === 'www.youtu.be';
+      } catch (error) {
+         return false;
+      }
+   }, 'Only YouTube urls are supported as of now');
+
 export const ScreenControlledVideoSchema = z.object({
    type: z.literal('controlled-video'),
-   url: z.string().url().min(1),
+   url: ScreenControlledVideoSchemaUrl,
    paused: z.boolean(),
-   startPosition: z.number().int(),
+   startPosition: z
+      .number()
+      .int()
+      .transform((val) => val || new Date().getTime()),
    controlToken: z.string().optional(),
 });
 

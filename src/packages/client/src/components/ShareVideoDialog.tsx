@@ -5,11 +5,11 @@ import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { setScreenContent } from '../services/screen';
-import { ScreenControlledVideo, ScreenInfo } from '../shared/Screen';
+import { ScreenControlledVideo, ScreenControlledVideoSchemaUrl, ScreenInfo } from '../shared/Screen';
 import { wrapForInputRef } from '../utils/react-hook-form-utils';
 import ShareVideoActionsPlayer from '../features/admin/components/ShareVideoActionsPlayer';
 
-const ShareVideoSchema = z.object({ url: z.string().min(1) });
+const ShareVideoSchema = z.object({ url: ScreenControlledVideoSchemaUrl });
 
 type ShareVideoForm = z.infer<typeof ShareVideoSchema>;
 
