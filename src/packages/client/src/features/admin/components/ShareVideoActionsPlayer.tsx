@@ -8,6 +8,6 @@ type Props = {
 };
 
 export default function ShareVideoActionsPlayer({ current, onChange }: Props) {
-   const props = useManagedVideo(current, onChange, false);
+   const props = useManagedVideo(current, onChange, true);
    return <Player {...props} controls={true} />;
 }
