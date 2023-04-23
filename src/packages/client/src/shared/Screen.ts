@@ -9,20 +9,26 @@ export const ScreenSchema = z.object({
       .max(12)
       .regex(/^[a-z0-9-]+$/, 'Zeichenfolge darf nur -, a-z und 0-9 beinhalten'),
    defaultContent: z.string().url().optional().or(emptyStringToUndefined),
+   onlyScreenShareAllowed: z.boolean().optional(),
+   allowedVideoHostNames: z.string().optional(),
 });
 
-export const ScreenControlledVideoSchemaUrl = z
-   .string()
-   .url()
-   .min(1)
-   .refine((s) => {
-      try {
-         const url = new URL(s);
-         return url.hostname === 'www.youtube.com' || url.hostname === 'www.youtu.be';
-      } catch (error) {
-         return false;
-      }
-   }, 'Only YouTube urls are supported as of now');
+export const ScreenControlledVideoSchemaUrl = z.string().url().min(1);
+
+export const validateUrlAgainstHostnames = (s: string, hostnamesString?: string) => {
+   if (!hostnamesString) return true;
+
+   const hostnames = hostnamesString
+      .split('\n')
+      .map((x) => x.trim())
+      .filter((x) => x);
+   try {
+      const url = new URL(s);
+      return hostnames.includes(url.hostname);
+   } catch (error) {
+      return false;
+   }
+};
 
 export const ScreenControlledVideoSchema = z.object({
    type: z.literal('controlled-video'),

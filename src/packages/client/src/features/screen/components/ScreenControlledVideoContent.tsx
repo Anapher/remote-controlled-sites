@@ -1,5 +1,5 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Fab } from '@mui/material';
+import { Fab, Slider, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import { useMutation } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
@@ -10,6 +10,7 @@ import { ScreenControlledVideo } from '../../../shared/Screen';
 import RequestUserInteractionView from '../../user-interaction/components/RequestUserInteractionView';
 import { selectHadUserInteraction } from '../../user-interaction/selectors';
 import { createId } from '@paralleldrive/cuid2';
+import { useState } from 'react';
 
 const clientId = createId();
 
@@ -38,6 +39,8 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
       mutation.mutate({ token, screenName, content: { ...content, controlToken: useControl ? undefined : clientId } });
    };
 
+   const [volume, setVolume] = useState(1);
+
    const hadInteraction = useSelector(selectHadUserInteraction);
    if (!hadInteraction) return <RequestUserInteractionView />;
 
@@ -51,9 +54,27 @@ export default function ScreenControlledVideoContent({ content, screenName, toke
             <Fab variant="extended" onClick={handleToggleControl} color={useControl ? 'secondary' : undefined}>
                {!useControl ? 'Video kontrollieren' : 'Video nicht mehr kontrollieren'}
             </Fab>
+            <Box flex={1} display="flex" flexDirection="row-reverse">
+               <Box flex={1} maxWidth={200} mx={2}>
+                  <Typography variant="caption">Lautstärke</Typography>
+                  <Slider
+                     min={0}
+                     max={1}
+                     step={0.1}
+                     value={volume}
+                     onChange={(_, value) => setVolume(value as number)}
+                  />
+               </Box>
+            </Box>
          </Stack>
          <Box flex={1}>
-            <ControlledVideo control={useControl} onChange={handleOnChange} content={content} key={`${useControl}`} />
+            <ControlledVideo
+               control={useControl}
+               onChange={handleOnChange}
+               content={content}
+               key={`${useControl}`}
+               volume={volume}
+            />
          </Box>
       </Box>
    );
@@ -63,9 +84,10 @@ type ControlledVideoProps = {
    control: boolean;
    content: ScreenControlledVideo;
    onChange: (content: ScreenControlledVideo) => void;
+   volume?: number;
 };
 
-const ControlledVideo = ({ control, content, onChange }: ControlledVideoProps) => {
+const ControlledVideo = ({ control, content, onChange, volume }: ControlledVideoProps) => {
    const props = useManagedVideo(content, onChange, control);
-   return <Player width={'100%'} height={'100%'} {...props} controls={control} />;
+   return <Player width={'100%'} height={'100%'} {...props} controls={control} volume={volume} />;
 };

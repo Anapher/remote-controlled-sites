@@ -1,17 +1,28 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Dialog, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { setScreenContent } from '../services/screen';
-import { ScreenControlledVideo, ScreenControlledVideoSchemaUrl, ScreenInfo } from '../shared/Screen';
+import {
+   ScreenControlledVideo,
+   ScreenControlledVideoSchemaUrl,
+   ScreenInfo,
+   validateUrlAgainstHostnames,
+} from '../shared/Screen';
 import { wrapForInputRef } from '../utils/react-hook-form-utils';
 import ShareVideoActionsPlayer from '../features/admin/components/ShareVideoActionsPlayer';
 
-const ShareVideoSchema = z.object({ url: ScreenControlledVideoSchemaUrl });
+const ShareVideoSchema = (screen?: ScreenInfo) =>
+   z.object({
+      url: ScreenControlledVideoSchemaUrl.refine(
+         (s) => validateUrlAgainstHostnames(s, screen?.allowedVideoHostNames),
+         'Only specific urls are allowed, they can be configured in the screen config',
+      ),
+   });
 
-type ShareVideoForm = z.infer<typeof ShareVideoSchema>;
+type ShareVideoForm = z.infer<ReturnType<typeof ShareVideoSchema>>;
 
 type Props = {
    open: boolean;
@@ -24,8 +35,8 @@ export default function ShareVideoDialog({ open, onClose, screenInfo, token }: P
    const {
       handleSubmit,
       register,
-      formState: { isValid },
-   } = useForm<ShareVideoForm>({ resolver: zodResolver(ShareVideoSchema), mode: 'onChange' });
+      formState: { errors, isValid },
+   } = useForm<ShareVideoForm>({ resolver: zodResolver(ShareVideoSchema(screenInfo)), mode: 'onChange' });
 
    const mutation = useMutation({
       mutationFn: setScreenContent,
@@ -61,9 +72,17 @@ export default function ShareVideoDialog({ open, onClose, screenInfo, token }: P
          <DialogContent>
             <form onSubmit={handleSubmit(handleSetVideo)}>
                <Stack my={2} spacing={1}>
-                  <TextField label="Video URL" size="small" fullWidth autoFocus {...wrapForInputRef(register('url'))} />
+                  <TextField
+                     label="Video URL"
+                     size="small"
+                     fullWidth
+                     autoFocus
+                     {...wrapForInputRef(register('url'))}
+                     helperText={errors.url?.message}
+                     FormHelperTextProps={{ color: 'red' }}
+                  />
                   <div>
-                     <Button variant="contained" disabled={!isValid} type="submit">
+                     <Button variant="contained" type="submit" disabled={!isValid}>
                         Teilen
                      </Button>
                   </div>

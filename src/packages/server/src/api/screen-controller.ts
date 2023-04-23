@@ -3,7 +3,13 @@ import { Server } from 'socket.io';
 import { authenticateToken } from '../auth';
 import { deleteScreen, getAllScreens, getScreen, setScreen } from '../database';
 import { getScreenContent, getScreenInfo, setScreenContent } from '../screen-content-manager';
-import { ScreenContent, ScreenContentSchema, ScreenInfo, ScreenSchema } from '../shared/Screen';
+import {
+   ScreenContent,
+   ScreenContentSchema,
+   ScreenInfo,
+   ScreenSchema,
+   validateUrlAgainstHostnames,
+} from '../shared/Screen';
 import { RESPONSE_ALL_SCREENS, ScreensResponse, SCREEN_UPDATED } from '../shared/ws-server-messages';
 import { ADMIN_ROOM_NAME } from '../websockets/consts';
 
@@ -102,6 +108,13 @@ export default function configureApi(app: Express, io: Server) {
       if (!screen) {
          resp.sendStatus(404);
          return;
+      }
+
+      if (result?.type === 'controlled-video') {
+         if (!validateUrlAgainstHostnames(result.url, screen?.allowedVideoHostNames)) {
+            resp.sendStatus(400);
+            return;
+         }
       }
 
       setScreenContent(name, result);

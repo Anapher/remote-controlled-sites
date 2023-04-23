@@ -45,6 +45,8 @@ export default function VideoGridContent({ screen, token }: Props) {
       });
    };
 
+   if (screen.onlyScreenShareAllowed) return null;
+
    return (
       <Box width="100%" height="100%" alignItems="center" justifyContent="center" display="flex">
          <Grid container sx={{ maxWidth: 600 }} spacing={4}>

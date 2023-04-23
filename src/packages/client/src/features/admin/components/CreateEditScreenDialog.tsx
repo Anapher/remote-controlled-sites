@@ -1,4 +1,14 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from '@mui/material';
+import {
+   Button,
+   Checkbox,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogTitle,
+   FormControlLabel,
+   Stack,
+   TextField,
+} from '@mui/material';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScreenDto, ScreenSchema } from '../../../shared/Screen';
@@ -17,6 +27,8 @@ export default function CreateEditDialog({ data, open, onClose, onExecute, isEdi
       defaultValues: {
          name: '',
          defaultContent: '',
+         onlyScreenShareAllowed: false,
+         allowedVideoHostNames: 'www.youtube.com\nwww.youtu.be',
          ...data,
       },
       resolver: zodResolver(ScreenSchema),
@@ -64,6 +76,32 @@ export default function CreateEditDialog({ data, open, onClose, onExecute, isEdi
                            label="Standard-Url"
                            error={!!error}
                            helperText={error?.message}
+                        />
+                     )}
+                  />
+                  <Controller
+                     control={control}
+                     name="onlyScreenShareAllowed"
+                     render={({ field: { onChange, value } }) => (
+                        <FormControlLabel
+                           control={<Checkbox checked={value} onChange={onChange} />}
+                           label="Nur Bildschirm teilen erlauben"
+                        />
+                     )}
+                  />
+                  <Controller
+                     control={control}
+                     name="allowedVideoHostNames"
+                     render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <TextField
+                           variant="standard"
+                           value={value}
+                           onChange={onChange}
+                           label="Erlaubte Url-Hostnames für Videos"
+                           error={!!error}
+                           helperText={error?.message}
+                           multiline
+                           maxRows={4}
                         />
                      )}
                   />

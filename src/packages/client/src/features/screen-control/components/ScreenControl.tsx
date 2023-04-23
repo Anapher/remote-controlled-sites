@@ -32,7 +32,7 @@ export default function ScreenControl({ token, screen, socket }: Props) {
             open={videoShareOpen}
             onClose={() => setVideoShareOpen(false)}
          />
-         <Box>
+         <Box display="flex" alignItems="center" flexDirection="column">
             <Typography variant="h3" gutterBottom align="center" sx={{ mb: 4 }}>
                Inhalte für Screen <b>{screen.name}</b>
             </Typography>
@@ -40,9 +40,11 @@ export default function ScreenControl({ token, screen, socket }: Props) {
                <Fab color="primary" variant="extended" onClick={handleToggleScreenShare} sx={{ width: 300 }}>
                   {currentScreenShare ? 'Bildschirm teilen beenden' : 'Bildschirm teilen'}
                </Fab>
-               <Fab color="primary" variant="extended" onClick={() => setVideoShareOpen(true)} sx={{ width: 300 }}>
-                  Video abspielen
-               </Fab>
+               {!screen.onlyScreenShareAllowed && (
+                  <Fab color="primary" variant="extended" onClick={() => setVideoShareOpen(true)} sx={{ width: 300 }}>
+                     Video abspielen
+                  </Fab>
+               )}
             </Stack>
          </Box>
       </Box>
