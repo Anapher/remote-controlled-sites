@@ -19,6 +19,7 @@ async function main() {
    await workers.run(config.mediasoup.numWorkers, config.mediasoup.workerSettings);
 
    const app = express();
+
    app.use(express.json());
    app.use(express.static('client'));
    app.use(cors());
@@ -43,7 +44,7 @@ async function main() {
    configureApi(app, io, manager);
    configureWebSockets(io, manager);
 
-   app.get('*', function (request, response) {
+   app.get('*', function (_, response) {
       response.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
    });
 

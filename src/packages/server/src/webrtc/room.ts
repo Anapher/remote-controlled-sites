@@ -1,3 +1,5 @@
+import { MediaKind, Router, RtpCapabilities, WebRtcTransportOptions } from 'mediasoup/node/lib/types';
+import * as errors from '../errors';
 import {
    ConnectTransportRequest,
    CreateTransportRequest,
@@ -7,14 +9,11 @@ import {
    TransportProduceRequest,
    TransportProduceResponse,
 } from '../shared/webrtc-types';
+import Logger from '../utils/logger';
 import { SuccessOrError } from './../shared/communication-types';
-import { MediaKind, Router, RtpCapabilities, WebRtcTransportOptions } from 'mediasoup/node/lib/types';
 import ClientMessenger from './client-messenger';
 import Connection from './connection';
 import { MediasoupMixer } from './mediasoup-mixer';
-import * as errors from '../errors';
-import Logger from '../utils/logger';
-import { setScreenContent } from '../screen-content-manager';
 
 const logger = new Logger('Room');
 

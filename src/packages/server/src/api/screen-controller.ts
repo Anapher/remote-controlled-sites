@@ -12,6 +12,7 @@ import {
 } from '../shared/Screen';
 import { RESPONSE_ALL_SCREENS, ScreensResponse, SCREEN_UPDATED } from '../shared/ws-server-messages';
 import { ADMIN_ROOM_NAME } from '../websockets/consts';
+import { asyncHandler } from '../utils/express-utils';
 
 export default function configureApi(app: Express, io: Server) {
    const getScreenResponse = async () => {
@@ -29,99 +30,116 @@ export default function configureApi(app: Express, io: Server) {
       io.to(ADMIN_ROOM_NAME).emit(RESPONSE_ALL_SCREENS, response);
    };
 
-   app.get('/api/screen/:name', async (req, resp) => {
-      const name = req.params.name;
-      try {
-         ScreenSchema.parse({ name });
-      } catch (error) {
-         resp.sendStatus(401);
-         return;
-      }
+   app.get(
+      '/api/screen/:name',
+      asyncHandler(async (req, resp) => {
+         const name = req.params.name;
+         try {
+            ScreenSchema.parse({ name });
+         } catch (error) {
+            resp.sendStatus(401);
+            return;
+         }
 
-      const screen = await getScreenInfo(name);
-      if (!screen) {
-         resp.sendStatus(404);
-         return;
-      }
+         const screen = await getScreenInfo(name);
+         if (!screen) {
+            resp.sendStatus(404);
+            return;
+         }
 
-      resp.json(screen);
-   });
+         resp.json(screen);
+      }),
+   );
 
-   app.get('/api/screen/', async (_, resp) => {
-      const response = await getScreenResponse();
-      resp.json(response);
-   });
+   app.get(
+      '/api/screen/',
+      asyncHandler(async (_, resp) => {
+         const response = await getScreenResponse();
+         resp.json(response);
+      }),
+   );
 
-   app.put('/api/screen/:name', authenticateToken, async (req, resp) => {
-      const name = req.params.name;
-      try {
-         ScreenSchema.parse({ name });
-      } catch (error) {
-         resp.sendStatus(401);
-         return;
-      }
+   app.put(
+      '/api/screen/:name',
+      authenticateToken,
+      asyncHandler(async (req, resp) => {
+         const name = req.params.name;
+         try {
+            ScreenSchema.parse({ name });
+         } catch (error) {
+            resp.sendStatus(401);
+            return;
+         }
 
-      const result = ScreenSchema.parse(req.body);
+         const result = ScreenSchema.parse(req.body);
 
-      await setScreen(result);
-      updateScreens();
+         await setScreen(result);
+         updateScreens();
 
-      io.emit(SCREEN_UPDATED, await getScreenInfo(result.name));
+         io.emit(SCREEN_UPDATED, await getScreenInfo(result.name));
 
-      resp.sendStatus(200);
-   });
+         resp.sendStatus(200);
+      }),
+   );
 
-   app.delete('/api/screen/:name', authenticateToken, async (req, resp) => {
-      const name = req.params.name;
-      try {
-         ScreenSchema.parse({ name });
-      } catch (error) {
-         resp.sendStatus(401);
-         return;
-      }
+   app.delete(
+      '/api/screen/:name',
+      authenticateToken,
+      asyncHandler(async (req, resp) => {
+         const name = req.params.name;
+         try {
+            ScreenSchema.parse({ name });
+         } catch (error) {
+            resp.sendStatus(401);
+            return;
+         }
 
-      await deleteScreen(name);
-      updateScreens();
+         await deleteScreen(name);
+         updateScreens();
 
-      resp.sendStatus(200);
-   });
+         resp.sendStatus(200);
+      }),
+   );
 
-   app.post('/api/screen/:name/content', async (req, resp) => {
-      const name = req.params.name;
-      try {
-         ScreenSchema.parse({ name });
-      } catch (error) {
-         resp.sendStatus(401);
-         return;
-      }
+   app.post(
+      '/api/screen/:name/content',
+      asyncHandler(async (req, resp) => {
+         const name = req.params.name;
+         try {
+            ScreenSchema.parse({ name });
+         } catch (error) {
+            resp.sendStatus(401);
+            return;
+         }
 
-      let result: ScreenContent;
-      try {
-         result = ScreenContentSchema.parse(req.body.content);
-      } catch (error) {
-         console.error('[change screen content] Validation failed', error);
-         resp.sendStatus(400);
-         return;
-      }
-
-      const screen = await getScreen(name);
-      if (!screen) {
-         resp.sendStatus(404);
-         return;
-      }
-
-      if (result?.type === 'controlled-video') {
-         if (!validateUrlAgainstHostnames(result.url, screen?.allowedVideoHostNames)) {
+         let result: ScreenContent;
+         try {
+            result = ScreenContentSchema.parse(req.body.content);
+         } catch (error) {
+            console.error('[change screen content] Validation failed', error);
             resp.sendStatus(400);
             return;
          }
-      }
 
-      setScreenContent(name, result);
+         const screen = await getScreen(name);
+         if (!screen) {
+            resp.sendStatus(404);
+            return;
+         }
 
-      updateScreens();
-      io.emit(SCREEN_UPDATED, await getScreenInfo(name));
+         if (result?.type === 'controlled-video') {
+            if (!validateUrlAgainstHostnames(result.url, screen?.allowedVideoHostNames)) {
+               resp.sendStatus(400);
+               return;
+            }
+         }
 
-      resp.sendStatus(200);
-   });
+         setScreenContent(name, result);
+
+         updateScreens();
+         io.emit(SCREEN_UPDATED, await getScreenInfo(name));
+
+         resp.sendStatus(200);
+      }),
+   );
 }
