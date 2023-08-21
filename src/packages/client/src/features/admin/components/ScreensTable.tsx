@@ -125,7 +125,7 @@ export default function ScreensTable({ onDelete, onEdit, socket }: Props) {
    };
 
    return (
-      <Table>
+      <Table style={{ width: '100%', tableLayout: 'fixed' }}>
          <ShareVideoDialog
             open={shareVideoOpen}
             onClose={handleCloseShareVideo}
