@@ -5,6 +5,10 @@ import { TOLERATED_POSITION_DIFF } from '../config';
 import useSynchronizedTime from '../features/sync-time/useSynchronizedTime';
 import { ScreenControlledVideo } from '../shared/Screen';
 
+// https://github.com/cookpete/react-player/blob/2811bc59b9368170acc20d4f1e39555413d0d9e1/src/patterns.js#L3C1-L4C1
+export const MATCH_URL_YOUTUBE =
+   /(?:youtu\.be\/|youtube(?:-nocookie|education)?\.com\/(?:embed\/|v\/|watch\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))((\w|-){11})|youtube\.com\/playlist\?list=|youtube\.com\/user\//;
+
 // The player must play once in order to be able to seek. Therefore, if the video is currently paused, we still play for one second to seek to the correct position
 
 const useDesyncChangeState: (
@@ -50,6 +54,11 @@ export default function useManagedVideo(
    };
 
    useEffect(() => {
+      if (!MATCH_URL_YOUTUBE.test(current.url)) {
+         setInitializing(false);
+         return;
+      }
+
       const token = setTimeout(() => {
          // independent of control, this is very important!
          playerRef.current?.seekTo((getSyncedTime() - latestStatus.current!.startPosition) / 1000, 'seconds');
@@ -57,7 +66,7 @@ export default function useManagedVideo(
       }, 1000);
 
       return () => clearTimeout(token);
-   }, [latestStatus]);
+   }, []);
 
    useEffect(() => {
       if (initializing) return;
